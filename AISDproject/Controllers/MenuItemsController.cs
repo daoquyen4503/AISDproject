@@ -1,170 +1,85 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using AISDproject.Data;
+using AISDproject.Services;
 using AISDproject.Models;
 
 namespace AISDproject.Controllers
 {
+    [Route("MenuItems")]
     public class MenuItemsController : Controller
     {
-        private readonly RestaurantContext _context;
+        private readonly IMenuItemService _service;
 
-        public MenuItemsController(RestaurantContext context)
+        public MenuItemsController(IMenuItemService service)
         {
-            _context = context;
+            _service = service;
         }
 
-        // GET: MenuItems
+        // Redirect nếu chỉ vào /MenuItems
+        [HttpGet("")]
+        public IActionResult RedirectToIndex()
+        {
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.MenuItems.ToListAsync());
+            var items = await _service.GetAllAsync();
+            return View(items);
         }
 
-        // GET: MenuItems/Details/5
-        public async Task<IActionResult> Details(int? id)
+        [HttpGet("Details/{id}")]
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var menuItem = await _context.MenuItems
-                .FirstOrDefaultAsync(m => m.MenuItemId == id);
-            if (menuItem == null)
-            {
-                return NotFound();
-            }
-
-            return View(menuItem);
+            var item = await _service.GetByIdAsync(id);
+            if (item == null) return NotFound();
+            return View(item);
         }
 
-        // GET: MenuItems/Create
+        [HttpGet("Create")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: MenuItems/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MenuItemId,Name,Description,Price,ImageUrl")] MenuItem menuItem)
+        [HttpPost("Create")]
+        public async Task<IActionResult> Create(MenuItem item)
         {
-            if (!ModelState.IsValid)
-            {
-                var errors = ModelState.Values.SelectMany(v => v.Errors)
-                                              .Select(e => e.ErrorMessage)
-                                              .ToList();
-
-                foreach (var error in errors)
-                {
-                    Console.WriteLine("Validation error: " + error); // hoặc log
-                }
-
-                return View(menuItem);
-            }
-
-            // ✅ Đoạn này đang thiếu
-            _context.Add(menuItem);
-            await _context.SaveChangesAsync();
-
+            if (!ModelState.IsValid) return View(item);
+            await _service.AddAsync(item);
             return RedirectToAction(nameof(Index));
         }
 
-
-        // GET: MenuItems/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [HttpGet("Edit/{id}")]
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var menuItem = await _context.MenuItems.FindAsync(id);
-            if (menuItem == null)
-            {
-                return NotFound();
-            }
-            return View(menuItem);
+            var item = await _service.GetByIdAsync(id);
+            if (item == null) return NotFound();
+            return View(item);
         }
 
-        // POST: MenuItems/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("MenuItemId,Name,Description,Price,ImageUrl")] MenuItem menuItem)
+        [HttpPost("Edit")]
+        public async Task<IActionResult> Edit(MenuItem item)
         {
-            if (id != menuItem.MenuItemId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(menuItem);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MenuItemExists(menuItem.MenuItemId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(menuItem);
+            if (!ModelState.IsValid) return View(item);
+            await _service.UpdateAsync(item);
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: MenuItems/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        [HttpGet("Delete/{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var menuItem = await _context.MenuItems
-                .FirstOrDefaultAsync(m => m.MenuItemId == id);
-            if (menuItem == null)
-            {
-                return NotFound();
-            }
-
-            return View(menuItem);
+            var item = await _service.GetByIdAsync(id);
+            if (item == null) return NotFound();
+            return View(item);
         }
 
-        // POST: MenuItems/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [HttpPost("Delete/{id}"), ActionName("DeleteConfirmed")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var menuItem = await _context.MenuItems.FindAsync(id);
-            if (menuItem != null)
-            {
-                _context.MenuItems.Remove(menuItem);
-            }
-
-            await _context.SaveChangesAsync();
+            await _service.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool MenuItemExists(int id)
-        {
-            return _context.MenuItems.Any(e => e.MenuItemId == id);
         }
     }
 }

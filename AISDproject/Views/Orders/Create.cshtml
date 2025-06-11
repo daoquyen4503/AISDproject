@@ -1,38 +1,122 @@
-﻿@model AISDproject.Models.Order
+﻿@model AISDproject.ViewModel.OrderCreateViewModel
 
-@{
-    ViewData["Title"] = "Create";
-}
+<h1>Create Order</h1>
 
-<h1>Create</h1>
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger"></div>
 
-<h4>Order</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="OrderTime" class="control-label"></label>
-                <input asp-for="OrderTime" class="form-control" />
-                <span asp-validation-for="OrderTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TableId" class="control-label"></label>
-                <select asp-for="TableId" class ="form-control" asp-items="ViewBag.TableId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="StaffId" class="control-label"></label>
-                <select asp-for="StaffId" class ="form-control" asp-items="ViewBag.StaffId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+    <div>
+        <label asp-for="OrderTime"></label>
+        <input asp-for="OrderTime" class="form-control" />
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div>
+        <label asp-for="TableId"></label>
+        <select asp-for="TableId" class="form-control" asp-items="Model.Tables">
+            <option value="">-- Select Table --</option>
+        </select>
+    </div>
 
+    <div>
+        <label asp-for="StaffId"></label>
+        <select asp-for="StaffId" class="form-control" asp-items="Model.Staffs">
+            <option value="">-- Select Staff --</option>
+        </select>
+    </div>
+
+    <hr />
+    <h4>Order Items</h4>
+
+    <table class="table" id="order-items-table">
+        <thead>
+            <tr>
+                <th>Menu Item</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="items-body">
+        </tbody>
+    </table>
+
+    <div class="form-group">
+        <select id="menuItemSelect" class="form-control" asp-items="Model.MenuItems">
+            <option value="">-- Select Menu Item --</option>
+        </select>
+        <input type="number" id="quantityInput" class="form-control" placeholder="Quantity" />
+        <button type="button" id="addItemBtn" class="btn btn-secondary mt-2">Add Item</button>
+    </div>
+
+    <input type="hidden" name="OrderItems" />
+
+    <button type="submit" class="btn btn-primary">Create Order</button>
+</form>
+
+@section Scripts {
+    <script>
+        const items = [];
+        const menuItemDict = {};
+
+        $('#menuItemSelect option').each(function () {
+            const val = $(this).val().split('|');
+            if (val.length == 2) {
+                menuItemDict[val[0]] = { name: $(this).text(), price: parseFloat(val[1]) };
+            }
+        });
+
+        $('#addItemBtn').click(function () {
+            const val = $('#menuItemSelect').val();
+            const quantity = parseInt($('#quantityInput').val());
+
+            if (!val || quantity <= 0) return;
+
+            const [menuItemId, price] = val.split('|');
+            const name = $('#menuItemSelect option:selected').text();
+            const subtotal = quantity * parseFloat(price);
+
+            items.push({ menuItemId, quantity });
+
+            $('#items-body').append(`
+                <tr>
+                    <td>${name}</td>
+                    <td>${price}</td>
+                    <td>${quantity}</td>
+                    <td>${subtotal.toFixed(2)}</td>
+                    <td><button type="button" class="btn btn-danger btn-sm remove">Remove</button></td>
+                </tr>
+            `);
+
+            updateOrderItemsField();
+        });
+
+        $(document).on('click', '.remove', function () {
+            const row = $(this).closest('tr');
+            row.remove();
+            // You can sync `items` if needed
+        });
+
+        function updateOrderItemsField() {
+            let orderItems = '';
+            $('#items-body tr').each(function () {
+                const tds = $(this).find('td');
+                const name = tds.eq(0).text();
+                const price = parseFloat(tds.eq(1).text());
+                const quantity = parseInt(tds.eq(2).text());
+
+                const menuItemId = Object.entries(menuItemDict).find(([id, m]) => m.name === name)[0];
+
+                orderItems += `
+                    <input type="hidden" name="OrderItems[${items.length}].MenuItemId" value="${menuItemId}" />
+                    <input type="hidden" name="OrderItems[${items.length}].Quantity" value="${quantity}" />
+                    <input type="hidden" name="OrderItems[${items.length}].Price" value="${price}" />
+                `;
+            });
+
+            $('input[name="OrderItems"]').remove();
+            $('form').append(orderItems);
+        }
+    </script>
+}

@@ -1,170 +1,156 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using AISDproject.Data;
+using AISDproject.Services;
 using AISDproject.Models;
+using AISDproject.ViewModel;
 
 namespace AISDproject.Controllers
 {
+    [Route("Orders")]
     public class OrdersController : Controller
     {
-        private readonly RestaurantContext _context;
+        private readonly IOrderService _orderService;
+        private readonly ITableService _tableService;
+        private readonly IStaffService _staffService;
+        private readonly IMenuItemService _menuItemService;
 
-        public OrdersController(RestaurantContext context)
+        public OrdersController(
+            IOrderService orderService,
+            ITableService tableService,
+            IStaffService staffService,
+            IMenuItemService menuItemService)
         {
-            _context = context;
+            _orderService = orderService;
+            _tableService = tableService;
+            _staffService = staffService;
+            _menuItemService = menuItemService;
         }
 
-        // GET: Orders
+        // GET: /Orders
+        [HttpGet("")]
+        public IActionResult RedirectToIndex() => RedirectToAction(nameof(Index));
+
+        // GET: /Orders/Index
+        [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
-            var restaurantContext = _context.Orders.Include(o => o.Staff).Include(o => o.Table);
-            return View(await restaurantContext.ToListAsync());
+            var orders = await _orderService.GetAllOrdersAsync();
+            return View(orders);
         }
 
-        // GET: Orders/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: /Orders/Details/{id}
+        [HttpGet("Details/{id}")]
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var order = await _context.Orders
-                .Include(o => o.Staff)
-                .Include(o => o.Table)
-                .FirstOrDefaultAsync(m => m.OrderId == id);
-            if (order == null)
-            {
-                return NotFound();
-            }
-
+            var order = await _orderService.GetOrderByIdAsync(id);
+            if (order == null) return NotFound();
             return View(order);
         }
 
-        // GET: Orders/Create
-        public IActionResult Create()
+        // GET: /Orders/Create
+        [HttpGet("Create")]
+        public async Task<IActionResult> Create()
         {
-            ViewData["StaffId"] = new SelectList(_context.Staffs, "StaffId", "FullName");
-            ViewData["TableId"] = new SelectList(_context.Tables, "TableId", "TableId");
-            return View();
+            var vm = new OrderCreateViewModel
+            {
+                Staffs = (await _orderService.GetStaffsAsync())
+                    .Select(s => new SelectListItem(s.FullName, s.StaffId.ToString())),
+                Tables = (await _orderService.GetTablesAsync())
+                    .Select(t => new SelectListItem(t.TableName, t.TableId.ToString())),
+                MenuItems = (await _orderService.GetMenuItemsAsync())
+                    .Select(m => new SelectListItem(m.Name, m.MenuItemId.ToString()))
+                // PaymentMethods and Statuses provided by ViewModel
+            };
+            return View(vm);
         }
 
-        // POST: Orders/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        // POST: /Orders/Create
+        [HttpPost("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrderId,OrderTime,TableId,StaffId")] Order order)
+        public async Task<IActionResult> Create(OrderCreateViewModel vm)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(order);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["StaffId"] = new SelectList(_context.Staffs, "StaffId", "FullName", order.StaffId);
-            ViewData["TableId"] = new SelectList(_context.Tables, "TableId", "TableId", order.TableId);
-            return View(order);
-        }
-
-        // GET: Orders/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
+                vm.Staffs = (await _orderService.GetStaffsAsync())
+                    .Select(s => new SelectListItem(s.FullName, s.StaffId.ToString()));
+                vm.Tables = (await _orderService.GetTablesAsync())
+                    .Select(t => new SelectListItem(t.TableName, t.TableId.ToString()));
+                vm.MenuItems = (await _orderService.GetMenuItemsAsync())
+                    .Select(m => new SelectListItem(m.Name, m.MenuItemId.ToString()));
+                return View(vm);
             }
 
-            var order = await _context.Orders.FindAsync(id);
-            if (order == null)
+            var order = new Order
             {
-                return NotFound();
-            }
-            ViewData["StaffId"] = new SelectList(_context.Staffs, "StaffId", "FullName", order.StaffId);
-            ViewData["TableId"] = new SelectList(_context.Tables, "TableId", "TableId", order.TableId);
-            return View(order);
-        }
+                StaffId = vm.StaffId,
+                TableId = vm.TableId,
+                Status = vm.Status
+            };
 
-        // POST: Orders/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("OrderId,OrderTime,TableId,StaffId")] Order order)
-        {
-            if (id != order.OrderId)
+            foreach (var it in vm.Items.Where(i => i.Quantity > 0))
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                var menu = (await _orderService.GetMenuItemsAsync()).First(m => m.MenuItemId == it.MenuItemId);
+                order.OrderItems.Add(new OrderItem
                 {
-                    _context.Update(order);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!OrderExists(order.OrderId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["StaffId"] = new SelectList(_context.Staffs, "StaffId", "FullName", order.StaffId);
-            ViewData["TableId"] = new SelectList(_context.Tables, "TableId", "TableId", order.TableId);
-            return View(order);
-        }
-
-        // GET: Orders/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
+                    MenuItemId = it.MenuItemId,
+                    Quantity = it.Quantity,
+                    MenuItem = menu
+                });
             }
 
-            var order = await _context.Orders
-                .Include(o => o.Staff)
-                .Include(o => o.Table)
-                .FirstOrDefaultAsync(m => m.OrderId == id);
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            return View(order);
-        }
-
-        // POST: Orders/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var order = await _context.Orders.FindAsync(id);
-            if (order != null)
-            {
-                _context.Orders.Remove(order);
-            }
-
-            await _context.SaveChangesAsync();
+            var payment = new Payment { PaymentMethod = vm.PaymentMethod };
+            await _orderService.CreateOrderAsync(order, payment);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool OrderExists(int id)
+            // Lưu ý: Dòng này bị dư, đã xử lý phía trên
+        
+
+        // GET: /Orders/Edit/{id}
+        [HttpGet("Edit/{id}")]
+        public async Task<IActionResult> Edit(int id)
         {
-            return _context.Orders.Any(e => e.OrderId == id);
+            var order = await _orderService.GetOrderByIdAsync(id);
+            if (order == null) return NotFound();
+
+            var vm = new OrderEditViewModel(order);
+            // populate dropdowns similar to Create GET
+            return View(vm);
+        }
+
+        // POST: /Orders/Edit/{id}
+        [HttpPost("Edit/{id}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, OrderEditViewModel vm)
+        {
+            if (id != vm.Id) return BadRequest();
+
+            if (!ModelState.IsValid) return View(vm);
+
+            var order = await _orderService.GetOrderByIdAsync(id);
+            // map fields from vm to order
+            await _orderService.UpdateOrderAsync(order);
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: /Orders/Delete/{id}
+        [HttpGet("Delete/{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var order = await _orderService.GetOrderByIdAsync(id);
+            if (order == null) return NotFound();
+            return View(order);
+        }
+
+        // POST: /Orders/Delete/{id}
+        [HttpPost("Delete/{id}"), ActionName("DeleteConfirmed")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            await _orderService.DeleteOrderAsync(id);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

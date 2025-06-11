@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AISDproject.Models
 {
+    public enum ReservationStatus { Pending, Confirmed, Cancelled }
+
     public class Reservation
     {
         [Key]
@@ -25,6 +27,6 @@ namespace AISDproject.Models
         public int TimeSlotId { get; set; }
         public TimeSlot TimeSlot { get; set; }
 
-        public string Status { get; set; } // Pending, Confirmed, Cancelled
+        public ReservationStatus Status { get; set; } = ReservationStatus.Pending;
     }
 }

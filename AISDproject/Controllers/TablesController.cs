@@ -1,45 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using AISDproject.Data;
 using AISDproject.Models;
+using AISDproject.Services;
 
 namespace AISDproject.Controllers
 {
     public class TablesController : Controller
     {
-        private readonly RestaurantContext _context;
+        private readonly ITableService _tableService;
 
-        public TablesController(RestaurantContext context)
+        public TablesController(ITableService tableService)
         {
-            _context = context;
+            _tableService = tableService;
         }
 
         // GET: Tables
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Tables.ToListAsync());
+            var tables = await _tableService.GetAllTablesAsync();
+            return View(tables);
         }
 
         // GET: Tables/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var table = await _context.Tables
-                .FirstOrDefaultAsync(m => m.TableId == id);
+            var table = await _tableService.GetTableByIdAsync(id);
             if (table == null)
-            {
                 return NotFound();
-            }
-
             return View(table);
         }
 
@@ -50,87 +37,49 @@ namespace AISDproject.Controllers
         }
 
         // POST: Tables/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TableId,TableName,Capacity")] Table table)
+        public async Task<IActionResult> Create(Table table)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(table);
-                await _context.SaveChangesAsync();
+                await _tableService.CreateTableAsync(table);
                 return RedirectToAction(nameof(Index));
             }
             return View(table);
         }
 
         // GET: Tables/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var table = await _context.Tables.FindAsync(id);
+            var table = await _tableService.GetTableByIdAsync(id);
             if (table == null)
-            {
                 return NotFound();
-            }
             return View(table);
         }
 
         // POST: Tables/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TableId,TableName,Capacity")] Table table)
+        public async Task<IActionResult> Edit(int id, Table table)
         {
             if (id != table.TableId)
-            {
-                return NotFound();
-            }
+                return BadRequest();
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(table);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TableExists(table.TableId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                await _tableService.UpdateTableAsync(table);
                 return RedirectToAction(nameof(Index));
             }
             return View(table);
         }
 
         // GET: Tables/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var table = await _context.Tables
-                .FirstOrDefaultAsync(m => m.TableId == id);
+            var table = await _tableService.GetTableByIdAsync(id);
             if (table == null)
-            {
                 return NotFound();
-            }
-
             return View(table);
         }
 
@@ -139,19 +88,8 @@ namespace AISDproject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var table = await _context.Tables.FindAsync(id);
-            if (table != null)
-            {
-                _context.Tables.Remove(table);
-            }
-
-            await _context.SaveChangesAsync();
+            await _tableService.DeleteTableAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool TableExists(int id)
-        {
-            return _context.Tables.Any(e => e.TableId == id);
         }
     }
 }
