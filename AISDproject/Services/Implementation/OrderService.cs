@@ -54,17 +54,43 @@ namespace AISDproject.Services.Implementation
 
         public async Task CreateOrderAsync(Order order, Payment payment)
         {
-            order.TotalAmount = order.SubTotal;
-            payment.OrderId = order.OrderId;
-            payment.Amount = order.TotalAmount;
+            decimal total = 0;
+
+            foreach (var item in order.OrderItems)
+            {
+                var menuItem = await _context.MenuItems.FindAsync(item.MenuItemId);
+                if (menuItem == null)
+                    throw new Exception("MenuItem not found");
+
+                total += item.Quantity * menuItem.Price;
+            }
+
+            order.TotalAmount = total;
 
             using var tx = await _context.Database.BeginTransactionAsync();
+
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
+
+            foreach (var item in order.OrderItems)
+            {
+                item.OrderId = order.OrderId;
+            }
+
+            _context.OrderItems.AddRange(order.OrderItems);
+
+            payment.OrderId = order.OrderId;
+            payment.Amount = total;
             _context.Payments.Add(payment);
+
             await _context.SaveChangesAsync();
             await tx.CommitAsync();
         }
+
+
+
+
+
 
         public async Task UpdateOrderAsync(Order order)
         {

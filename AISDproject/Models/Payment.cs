@@ -5,26 +5,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace AISDproject.Models
 {
     public enum PaymentMethod { Cash, Card, Online }
+    public enum PaymentStatus { Pending, Paid, Failed }
 
     public class Payment
     {
-        [Key]
         public int PaymentId { get; set; }
-
-        [Required]
-        public int OrderId { get; set; }
-
-        [Display(Name = "Ngày thanh toán")]
-        public DateTime PaymentDate { get; set; } = DateTime.Now;
-
-        [Display(Name = "Phương thức thanh toán")]
-        [Required]
+        public DateTime PaymentDate { get; set; }
+        public decimal Amount { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
 
-        [Display(Name = "Số tiền thanh toán")]
-        public decimal Amount { get; set; }
-
-        [ForeignKey("OrderId")]
+        // Foreign key
+        public int OrderId { get; set; }
         public Order Order { get; set; }
+
+        // ✅ Thêm các thuộc tính sau
+        public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
+        public DateTime? PaymentTime { get; set; }
     }
+
 }

@@ -1,122 +1,127 @@
-﻿@model AISDproject.ViewModel.OrderCreateViewModel
+﻿@model AISDproject.ViewModels.OrderCreateViewModel
+
+@{
+    ViewData["Title"] = "Create Order";
+
+    var menuItemsJson = System.Text.Json.JsonSerializer.Serialize(
+        Model.MenuItems?.ToDictionary(m => m.MenuItemId, m => m.Price) ?? new Dictionary<int, decimal>()
+    );
+
+    var menuOptionsHtml = string.Join("", Model.MenuItemList.Select(item =>
+        $"<option value='{item.Value}'>{item.Text}</option>"));
+}
 
 <h1>Create Order</h1>
 
 <form asp-action="Create" method="post">
-    @Html.AntiForgeryToken()
-    <div asp-validation-summary="All" class="text-danger"></div>
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-    <div>
-        <label asp-for="OrderTime"></label>
-        <input asp-for="OrderTime" class="form-control" />
+    <div class="form-group">
+        <label asp-for="TableId" class="control-label"></label>
+        <select asp-for="TableId" asp-items="Model.TableList" class="form-control"></select>
+        <span asp-validation-for="TableId" class="text-danger"></span>
     </div>
 
-    <div>
-        <label asp-for="TableId"></label>
-        <select asp-for="TableId" class="form-control" asp-items="Model.Tables">
-            <option value="">-- Select Table --</option>
-        </select>
+    <div class="form-group">
+        <label asp-for="StaffId" class="control-label"></label>
+        <select asp-for="StaffId" asp-items="Model.StaffList" class="form-control"></select>
+        <span asp-validation-for="StaffId" class="text-danger"></span>
     </div>
 
-    <div>
-        <label asp-for="StaffId"></label>
-        <select asp-for="StaffId" class="form-control" asp-items="Model.Staffs">
-            <option value="">-- Select Staff --</option>
-        </select>
-    </div>
-
-    <hr />
     <h4>Order Items</h4>
 
-    <table class="table" id="order-items-table">
+    <table class="table" id="itemsTable">
         <thead>
             <tr>
                 <th>Menu Item</th>
-                <th>Price</th>
                 <th>Quantity</th>
-                <th>Subtotal</th>
                 <th></th>
             </tr>
         </thead>
-        <tbody id="items-body">
+        <tbody>
+            @for (int i = 0; i < Model.Items.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <select asp-for="Items[@i].MenuItemId" asp-items="Model.MenuItemList" class="form-control item-select"></select>
+                        <span asp-validation-for="Items[@i].MenuItemId" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <input asp-for="Items[@i].Quantity" class="form-control qty-input" />
+                        <span asp-validation-for="Items[@i].Quantity" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger" onclick="removeRow(this)">X</button>
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 
-    <div class="form-group">
-        <select id="menuItemSelect" class="form-control" asp-items="Model.MenuItems">
-            <option value="">-- Select Menu Item --</option>
-        </select>
-        <input type="number" id="quantityInput" class="form-control" placeholder="Quantity" />
-        <button type="button" id="addItemBtn" class="btn btn-secondary mt-2">Add Item</button>
+    <button type="button" class="btn btn-secondary" onclick="addRow()">+ Add Item</button>
+
+    <div class="mt-3">
+        <strong>Tổng tiền: </strong><span id="total-amount">0</span> ₫
+        <input type="hidden" name="TotalAmount" id="TotalAmount" value="0" />
     </div>
 
-    <input type="hidden" name="OrderItems" />
-
-    <button type="submit" class="btn btn-primary">Create Order</button>
+    <button type="submit" class="btn btn-primary mt-2">Create Order</button>
 </form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
 
 @section Scripts {
     <script>
-        const items = [];
-        const menuItemDict = {};
+        const prices = @Html.Raw(menuItemsJson);
+        const menuOptions = `@Html.Raw(menuOptionsHtml)`;
 
-        $('#menuItemSelect option').each(function () {
-            const val = $(this).val().split('|');
-            if (val.length == 2) {
-                menuItemDict[val[0]] = { name: $(this).text(), price: parseFloat(val[1]) };
+        function updateTotal() {
+            let total = 0;
+            document.querySelectorAll("#itemsTable tbody tr").forEach(row => {
+                const menuItemId = row.querySelector(".item-select").value;
+                const qty = parseInt(row.querySelector(".qty-input").value) || 0;
+                const price = prices[menuItemId] || 0;
+                total += price * qty;
+            });
+            document.getElementById("total-amount").textContent = total.toLocaleString();
+            document.getElementById("TotalAmount").value = total;
+        }
+
+        function addRow() {
+            const index = document.querySelectorAll("#itemsTable tbody tr").length;
+            const row = `
+                <tr>
+                    <td>
+                        <select name="Items[${index}].MenuItemId" class="form-control item-select">
+                            ${menuOptions}
+                        </select>
+                        <span class="text-danger field-validation-valid" data-valmsg-for="Items[${index}].MenuItemId" data-valmsg-replace="true"></span>
+                    </td>
+                    <td>
+                        <input name="Items[${index}].Quantity" class="form-control qty-input" value="1" />
+                        <span class="text-danger field-validation-valid" data-valmsg-for="Items[${index}].Quantity" data-valmsg-replace="true"></span>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger" onclick="removeRow(this)">X</button>
+                    </td>
+                </tr>`;
+            document.querySelector("#itemsTable tbody").insertAdjacentHTML("beforeend", row);
+            updateTotal();
+        }
+
+        function removeRow(btn) {
+            btn.closest("tr").remove();
+            updateTotal();
+        }
+
+        document.addEventListener("input", function (e) {
+            if (e.target.classList.contains("item-select") || e.target.classList.contains("qty-input")) {
+                updateTotal();
             }
         });
 
-        $('#addItemBtn').click(function () {
-            const val = $('#menuItemSelect').val();
-            const quantity = parseInt($('#quantityInput').val());
-
-            if (!val || quantity <= 0) return;
-
-            const [menuItemId, price] = val.split('|');
-            const name = $('#menuItemSelect option:selected').text();
-            const subtotal = quantity * parseFloat(price);
-
-            items.push({ menuItemId, quantity });
-
-            $('#items-body').append(`
-                <tr>
-                    <td>${name}</td>
-                    <td>${price}</td>
-                    <td>${quantity}</td>
-                    <td>${subtotal.toFixed(2)}</td>
-                    <td><button type="button" class="btn btn-danger btn-sm remove">Remove</button></td>
-                </tr>
-            `);
-
-            updateOrderItemsField();
-        });
-
-        $(document).on('click', '.remove', function () {
-            const row = $(this).closest('tr');
-            row.remove();
-            // You can sync `items` if needed
-        });
-
-        function updateOrderItemsField() {
-            let orderItems = '';
-            $('#items-body tr').each(function () {
-                const tds = $(this).find('td');
-                const name = tds.eq(0).text();
-                const price = parseFloat(tds.eq(1).text());
-                const quantity = parseInt(tds.eq(2).text());
-
-                const menuItemId = Object.entries(menuItemDict).find(([id, m]) => m.name === name)[0];
-
-                orderItems += `
-                    <input type="hidden" name="OrderItems[${items.length}].MenuItemId" value="${menuItemId}" />
-                    <input type="hidden" name="OrderItems[${items.length}].Quantity" value="${quantity}" />
-                    <input type="hidden" name="OrderItems[${items.length}].Price" value="${price}" />
-                `;
-            });
-
-            $('input[name="OrderItems"]').remove();
-            $('form').append(orderItems);
-        }
+        document.addEventListener("DOMContentLoaded", updateTotal);
     </script>
 }

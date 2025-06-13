@@ -1,0 +1,1 @@
+﻿ALTER TABLE MenuItems DROP COLUMN Status;

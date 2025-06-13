@@ -1,155 +1,116 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using AISDproject.Models;
+using AISDproject.Services;
+using AISDproject.ViewModel;
+using AISDproject.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using AISDproject.Services;
-using AISDproject.Models;
-using AISDproject.ViewModel;
 
 namespace AISDproject.Controllers
 {
-    [Route("Orders")]
     public class OrdersController : Controller
     {
         private readonly IOrderService _orderService;
-        private readonly ITableService _tableService;
-        private readonly IStaffService _staffService;
-        private readonly IMenuItemService _menuItemService;
 
-        public OrdersController(
-            IOrderService orderService,
-            ITableService tableService,
-            IStaffService staffService,
-            IMenuItemService menuItemService)
+        public OrdersController(IOrderService orderService)
         {
             _orderService = orderService;
-            _tableService = tableService;
-            _staffService = staffService;
-            _menuItemService = menuItemService;
         }
 
-        // GET: /Orders
-        [HttpGet("")]
-        public IActionResult RedirectToIndex() => RedirectToAction(nameof(Index));
-
-        // GET: /Orders/Index
-        [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
             var orders = await _orderService.GetAllOrdersAsync();
             return View(orders);
         }
 
-        // GET: /Orders/Details/{id}
-        [HttpGet("Details/{id}")]
-        public async Task<IActionResult> Details(int id)
-        {
-            var order = await _orderService.GetOrderByIdAsync(id);
-            if (order == null) return NotFound();
-            return View(order);
-        }
-
-        // GET: /Orders/Create
-        [HttpGet("Create")]
         public async Task<IActionResult> Create()
         {
-            var vm = new OrderCreateViewModel
+            var tables = await _orderService.GetTablesAsync();
+            var staffs = await _orderService.GetStaffsAsync();
+            var menuItems = await _orderService.GetMenuItemsAsync();
+
+            var viewModel = new OrderCreateViewModel
             {
-                Staffs = (await _orderService.GetStaffsAsync())
-                    .Select(s => new SelectListItem(s.FullName, s.StaffId.ToString())),
-                Tables = (await _orderService.GetTablesAsync())
-                    .Select(t => new SelectListItem(t.TableName, t.TableId.ToString())),
-                MenuItems = (await _orderService.GetMenuItemsAsync())
-                    .Select(m => new SelectListItem(m.Name, m.MenuItemId.ToString()))
-                // PaymentMethods and Statuses provided by ViewModel
+                TableList = tables.Select(t => new SelectListItem
+                {
+                    Value = t.TableId.ToString(),
+                    Text = t.TableName
+                }).ToList(),
+
+                StaffList = staffs.Select(s => new SelectListItem
+                {
+                    Value = s.StaffId.ToString(),
+                    Text = s.FullName
+                }).ToList(),
+
+                MenuItemList = menuItems.Select(m => new SelectListItem
+                {
+                    Value = m.MenuItemId.ToString(),
+                    Text = m.Name
+                }).ToList(),
+
+                MenuItems = menuItems.ToList(),
+                Items = new List<OrderItemViewModel> { new() }
             };
-            return View(vm);
+
+            return View(viewModel);
         }
 
-        // POST: /Orders/Create
-        [HttpPost("Create")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(OrderCreateViewModel vm)
+        public async Task<IActionResult> Create(OrderCreateViewModel model)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || model.Items == null || !model.Items.Any())
             {
-                vm.Staffs = (await _orderService.GetStaffsAsync())
-                    .Select(s => new SelectListItem(s.FullName, s.StaffId.ToString()));
-                vm.Tables = (await _orderService.GetTablesAsync())
-                    .Select(t => new SelectListItem(t.TableName, t.TableId.ToString()));
-                vm.MenuItems = (await _orderService.GetMenuItemsAsync())
-                    .Select(m => new SelectListItem(m.Name, m.MenuItemId.ToString()));
-                return View(vm);
+                ModelState.AddModelError("", "Bạn phải chọn ít nhất một món ăn.");
+
+                var tables = await _orderService.GetTablesAsync();
+                var staffs = await _orderService.GetStaffsAsync();
+                var menuItems = await _orderService.GetMenuItemsAsync();
+
+                model.TableList = tables.Select(t => new SelectListItem
+                {
+                    Value = t.TableId.ToString(),
+                    Text = t.TableName
+                }).ToList();
+
+                model.StaffList = staffs.Select(s => new SelectListItem
+                {
+                    Value = s.StaffId.ToString(),
+                    Text = s.FullName
+                }).ToList();
+
+                model.MenuItemList = menuItems.Select(m => new SelectListItem
+                {
+                    Value = m.MenuItemId.ToString(),
+                    Text = m.Name
+                }).ToList();
+
+                model.MenuItems = menuItems.ToList();
+
+                return View(model);
             }
 
             var order = new Order
             {
-                StaffId = vm.StaffId,
-                TableId = vm.TableId,
-                Status = vm.Status
+                CreatedAt = DateTime.Now,
+                TableId = model.TableId,
+                StaffId = model.StaffId,
+                Status = OrderStatus.Pending,
+                OrderItems = model.Items.Select(i => new OrderItem
+                {
+                    MenuItemId = i.MenuItemId,
+                    Quantity = i.Quantity
+                }).ToList()
             };
 
-            foreach (var it in vm.Items.Where(i => i.Quantity > 0))
+            var payment = new Payment
             {
-                var menu = (await _orderService.GetMenuItemsAsync()).First(m => m.MenuItemId == it.MenuItemId);
-                order.OrderItems.Add(new OrderItem
-                {
-                    MenuItemId = it.MenuItemId,
-                    Quantity = it.Quantity,
-                    MenuItem = menu
-                });
-            }
+                PaymentDate = DateTime.Now,
+                PaymentMethod = PaymentMethod.Cash // default
+            };
 
-            var payment = new Payment { PaymentMethod = vm.PaymentMethod };
             await _orderService.CreateOrderAsync(order, payment);
-            return RedirectToAction(nameof(Index));
-        }
 
-            // Lưu ý: Dòng này bị dư, đã xử lý phía trên
-        
-
-        // GET: /Orders/Edit/{id}
-        [HttpGet("Edit/{id}")]
-        public async Task<IActionResult> Edit(int id)
-        {
-            var order = await _orderService.GetOrderByIdAsync(id);
-            if (order == null) return NotFound();
-
-            var vm = new OrderEditViewModel(order);
-            // populate dropdowns similar to Create GET
-            return View(vm);
-        }
-
-        // POST: /Orders/Edit/{id}
-        [HttpPost("Edit/{id}")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, OrderEditViewModel vm)
-        {
-            if (id != vm.Id) return BadRequest();
-
-            if (!ModelState.IsValid) return View(vm);
-
-            var order = await _orderService.GetOrderByIdAsync(id);
-            // map fields from vm to order
-            await _orderService.UpdateOrderAsync(order);
-            return RedirectToAction(nameof(Index));
-        }
-
-        // GET: /Orders/Delete/{id}
-        [HttpGet("Delete/{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var order = await _orderService.GetOrderByIdAsync(id);
-            if (order == null) return NotFound();
-            return View(order);
-        }
-
-        // POST: /Orders/Delete/{id}
-        [HttpPost("Delete/{id}"), ActionName("DeleteConfirmed")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            await _orderService.DeleteOrderAsync(id);
             return RedirectToAction(nameof(Index));
         }
     }

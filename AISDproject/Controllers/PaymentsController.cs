@@ -97,5 +97,27 @@ namespace AISDproject.Controllers
             await _paymentService.DeletePaymentAsync(id);
             return RedirectToAction(nameof(Index));
         }
+
+        // POST: /Payments/Confirm/{id}
+        [HttpPost("Confirm/{id}")]
+        public async Task<IActionResult> Confirm(int id)
+        {
+            var payment = await _paymentService.GetPaymentByIdAsync(id);
+            if (payment == null) return NotFound();
+
+            // Cập nhật trạng thái thanh toán
+            payment.Status = PaymentStatus.Paid;
+            payment.PaymentTime = DateTime.Now;
+
+            // Optional: nếu muốn cập nhật trạng thái đơn hàng
+            if (payment.Order != null)
+            {
+                payment.Order.Status = OrderStatus.Completed;
+            }
+
+            await _paymentService.UpdatePaymentAsync(payment);
+            return RedirectToAction(nameof(Details), new { id = payment.PaymentId });
+        }
+
     }
 }

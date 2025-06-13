@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AISDproject.Migrations
 {
     [DbContext(typeof(RestaurantContext))]
-    [Migration("20250613080323_AddMenuItemsStatus")]
-    partial class AddMenuItemsStatus
+    [Migration("20250613113827_AddStatusToMenuItems")]
+    partial class AddStatusToMenuItems
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -138,6 +138,12 @@ namespace AISDproject.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("PaymentTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.HasKey("PaymentId");
 
                     b.HasIndex("OrderId")
@@ -221,6 +227,9 @@ namespace AISDproject.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TableId"));
 
                     b.Property<int>("Capacity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("TableName")
