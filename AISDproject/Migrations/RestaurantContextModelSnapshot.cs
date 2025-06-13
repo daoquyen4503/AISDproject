@@ -220,6 +220,9 @@ namespace AISDproject.Migrations
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<string>("TableName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
