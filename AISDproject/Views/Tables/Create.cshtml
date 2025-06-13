@@ -1,4 +1,5 @@
 ﻿@model AISDproject.Models.Table
+@using AISDproject.Models
 
 @{
     ViewData["Title"] = "Create Table";
@@ -6,66 +7,110 @@
 
 <style>
     .create-bg {
-        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/images/table-background.jpg') center/cover no-repeat;
-        padding: 60px 0;
+        background: #f8f9fa;
+        padding: 40px 0 60px;
+    }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1d3557;
+        margin-bottom: 20px;
+        text-align: center;
     }
 
     .card-create {
-        background-color: #ffffffee;
-        border-radius: 20px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        background-color: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 30px 35px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        max-width: 550px;
+        margin: 0 auto;
     }
 
-    .form-icon {
-        font-size: 24px;
-        margin-right: 8px;
-        color: #dc3545;
+    .form-label {
+        font-size: 15px;
+        font-weight: 500;
+        color: #212529;
     }
+
+    .form-control,
+    .form-select {
+        height: 42px;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .btn-primary-custom {
+        background-color: #c92a2a;
+        border-color: #c92a2a;
+        color: #fff;
+        font-size: 14px;
+        padding: 8px 24px;
+        font-weight: 500;
+    }
+
+        .btn-primary-custom:hover {
+            background-color: #a61e1e;
+            border-color: #a61e1e;
+        }
+
+    .btn-outline-secondary-custom {
+        font-size: 14px;
+        padding: 8px 20px;
+        color: #6c757d;
+        border: 1px solid #ced4da;
+    }
+
+        .btn-outline-secondary-custom:hover {
+            background-color: #f1f3f5;
+        }
 </style>
 
 <section class="create-bg">
-    <div class="container" data-aos="fade-up">
-        <div class="text-center text-white mb-5">
-            <h2 class="fw-bold display-6">✨ Add a New Table ✨</h2>
-            <p class="lead">Organize your restaurant more efficiently by adding tables to the system</p>
-        </div>
+    <div class="container">
+        <h2 class="section-title">Add a New Table</h2>
 
-        <div class="row justify-content-center">
-            <div class="col-lg-6">
-                <div class="card card-create p-4" data-aos="zoom-in">
-                    <form asp-action="Create" method="post" novalidate>
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div class="card-create mt-3">
+            <form asp-action="Create" method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                        <div class="form-group mb-4">
-                            <label asp-for="TableName" class="form-label fw-semibold">
-                                <i class="bi bi-grid form-icon"></i>Table Name
-                            </label>
-                            <input asp-for="TableName" class="form-control rounded-pill px-3" placeholder="E.g. T01, VIP2" />
-                            <span asp-validation-for="TableName" class="text-danger small"></span>
-                        </div>
-
-                        <div class="form-group mb-4">
-                            <label asp-for="Capacity" class="form-label fw-semibold">
-                                <i class="bi bi-people form-icon"></i>Capacity
-                            </label>
-                            <input asp-for="Capacity" class="form-control rounded-pill px-3" placeholder="E.g. 4, 6, 10" />
-                            <span asp-validation-for="Capacity" class="text-danger small"></span>
-                        </div>
-
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-danger rounded-pill px-4 py-2 shadow">
-                                <i class="bi bi-plus-circle me-2"></i> Create Table
-                            </button>
-                        </div>
-                    </form>
-
-                    <div class="mt-4 text-center">
-                        <a asp-action="Index" class="btn btn-outline-dark rounded-pill">
-                            ← Back to Table List
-                        </a>
-                    </div>
+                <!-- Table Name -->
+                <div class="form-group mb-3">
+                    <label asp-for="TableName" class="form-label">Table Name</label>
+                    <input asp-for="TableName" class="form-control" placeholder="e.g., T01, VIP2" />
+                    <span asp-validation-for="TableName" class="text-danger small"></span>
                 </div>
-            </div>
+
+                <!-- Capacity -->
+                <div class="form-group mb-3">
+                    <label asp-for="Capacity" class="form-label">Capacity</label>
+                    <input asp-for="Capacity" class="form-control" placeholder="e.g., 4, 6, 10" />
+                    <span asp-validation-for="Capacity" class="text-danger small"></span>
+                </div>
+
+                <!-- Status -->
+                <div class="form-group mb-4">
+                    <label asp-for="Status" class="form-label">Status</label>
+                    <select asp-for="Status"
+                            asp-items="Html.GetEnumSelectList<Table.TableStatus>()"
+                            class="form-select">
+                        <option value="">-- Select status --</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger small"></span>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <a asp-action="Index" class="btn btn-outline-secondary-custom rounded-pill">
+                        ← Back
+                    </a>
+                    <button type="submit" class="btn btn-primary-custom rounded-pill">
+                        <i class="bi bi-plus-circle me-1"></i> Create
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </section>

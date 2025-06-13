@@ -1,8 +1,9 @@
-﻿@{
+﻿@model IEnumerable<AISDproject.Models.MenuItem>
+
+@{
     ViewData["Title"] = "Home";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 
 <!-- ======= Hero Section ======= -->
 <section id="hero" class="d-flex align-items-center">
@@ -52,135 +53,123 @@
     </div>
 </section>
 
-<!-- ======= Specials Section ======= -->
+<!-- ======= Specials Section (Dynamic from MenuItems) ======= -->
 <section id="specials" class="specials">
     <div class="container" data-aos="fade-up">
         <div class="section-title">
-            <h2>Specials</h2>
-            <p>Check Our Specials</p>
+            <h2>Menu</h2>
+            <p>Explore Our Dishes</p>
         </div>
+
         <div class="row">
+            <!-- Tab list -->
             <div class="col-lg-4">
                 <ul class="nav nav-tabs flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active show" data-bs-toggle="tab" href="#tab-1">Grilled Chicken</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#tab-2">Seafood Pasta</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#tab-3">Vegetarian Delight</a>
-                    </li>
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        var item = Model.ElementAt(i);
+                        <li class="nav-item">
+                            <a class="nav-link @(i == 0 ? "active show" : "")" data-bs-toggle="tab" href="#tab-@i">
+                                @item.Name
+                            </a>
+                        </li>
+                    }
                 </ul>
             </div>
+
+            <!-- Tab content -->
             <div class="col-lg-8 mt-4 mt-lg-0">
                 <div class="tab-content">
-                    <div class="tab-pane active show" id="tab-1">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <img src="~/assets/img/menu/menu-item-2.png" alt="" class="img-fluid">
-                            </div>
-                            <div class="col-lg-6 details">
-                                <h3>Grilled Chicken</h3>
-                                <p class="fst-italic">Perfectly marinated and grilled chicken served with veggies.</p>
-                                <p>Our grilled chicken is prepared with house-made spices and accompanied by seasonal vegetables for a delightful experience.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tab-pane" id="tab-2">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <img src="~/assets/img/menu/menu-item-3.png" alt="" class="img-fluid">
-                            </div>
-                            <div class="col-lg-6 details">
-                                <h3>Seafood Pasta</h3>
-                                <p class="fst-italic">Prawns and squid tossed in creamy tomato sauce over fettuccine.</p>
-                                <p>A customer favorite! Our pasta is made fresh daily and served hot with parmesan and herbs.</p>
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        var item = Model.ElementAt(i);
+                        <div class="tab-pane @(i == 0 ? "active show" : "")" id="tab-@i">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <img src="@item.ImageUrl" alt="@item.Name" class="img-fluid" />
+                                </div>
+                                <div class="col-lg-6 details">
+                                    <h3>@item.Name</h3>
+                                    <p class="fst-italic text-muted">
+                                        @(string.IsNullOrEmpty(item.Description) ? "No description available." : item.Description)
+                                    </p>
+                                    <p><strong class="text-danger">@item.Price.ToString("C")</strong></p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="tab-pane" id="tab-3">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <img src="~/assets/img/menu/menu-item-4.png" alt="" class="img-fluid">
-                            </div>
-                            <div class="col-lg-6 details">
-                                <h3>Vegetarian Delight</h3>
-                                <p class="fst-italic">A healthy mix of vegetables sautéed in olive oil and fresh herbs.</p>
-                                <p>Fresh, light and full of flavor — this dish is a perfect option for vegetarians and healthy eaters alike.</p>
-                            </div>
-                        </div>
-                    </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- ======= Chefs Section ======= -->
+            <!-- ======= Chefs Section ======= -->
 <section id="chefs" class="chefs section-bg">
-    <div class="container" data-aos="fade-up">
+                <div class="container" data-aos="fade-up">
 
-        <div class="section-title">
-            <h2>Chefs</h2>
-            <p>Our Professional Chefs</p>
+                    <div class="section-title">
+                        <h2>Chefs</h2>
+                        <p>Our Professional Chefs</p>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
+                            <div class="chef-member" data-aos="zoom-in" data-aos-delay="100">
+                                <a href="https://en.wikipedia.org/wiki/Walter_White_(Breaking_Bad)" target="_blank">
+                                    <img src="~/assets/img/chefs/chefs-1.jpg" class="img-fluid" alt="Chef Walter White">
+                                </a>
+                                <div class="member-content">
+                                    <h4>
+                                        <a href="https://en.wikipedia.org/wiki/Walter_White_(Breaking_Bad)" target="_blank">Walter White</a>
+                                    </h4>
+                                    <span>Master Chef</span>
+                                    <p>
+                                        Walter brings over 20 years of culinary excellence to our kitchen, crafting each dish with precision and passion.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
+                            <div class="chef-member" data-aos="zoom-in" data-aos-delay="200">
+                                <a href="https://vi.wikipedia.org/wiki/Gordon_Ramsay" target="_blank">
+                                    <img src="~/assets/img/chefs/chefs-4.jpg" class="img-fluid" alt="Chef Gordon Ramsay">
+                                </a>
+                                <div class="member-content">
+                                    <h4>
+                                        <a href="https://en.wikipedia.org/wiki/Sarah_(given_name)" target="_blank">Gordon Ramsay</a>
+                                    </h4>
+                                    <span>Passier</span>
+                                    <p>
+                                        Known for her exquisite desserts and pastries, Sarah adds sweetness and creativity to every plate.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
+                            <div class="chef-member" data-aos="zoom-in" data-aos-delay="300">
+                                <a href="https://en.wikipedia.org/wiki/William_Anderson_(naval_officer)" target="_blank">
+                                    <img src="~/assets/img/chefs/chefs-3.jpg" class="img-fluid" alt="Chef William Anderson">
+                                </a>
+                                <div class="member-content">
+                                    <h4>
+                                        <a href="https://en.wikipedia.org/wiki/William_Anderson_(naval_officer)" target="_blank">William Anderson</a>
+                                    </h4>
+                                    <span>Cook</span>
+                                    <p>
+                                        William specializes in grilled and savory dishes, delivering bold flavors that keep guests coming back.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
         </div>
-
-        <div class="row">
-
-            <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
-                <div class="chef-member" data-aos="zoom-in" data-aos-delay="100">
-                    <a href="https://en.wikipedia.org/wiki/Walter_White_(Breaking_Bad)" target="_blank">
-                        <img src="~/assets/img/chefs/chefs-1.jpg" class="img-fluid" alt="Chef Walter White">
-                    </a>
-                    <div class="member-content">
-                        <h4>
-                            <a href="https://en.wikipedia.org/wiki/Walter_White_(Breaking_Bad)" target="_blank">Walter White</a>
-                        </h4>
-                        <span>Master Chef</span>
-                        <p>
-                            Walter brings over 20 years of culinary excellence to our kitchen, crafting each dish with precision and passion.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
-                <div class="chef-member" data-aos="zoom-in" data-aos-delay="200">
-                    <a href="https://vi.wikipedia.org/wiki/Gordon_Ramsay" target="_blank">
-                        <img src="~/assets/img/chefs/chefs-4.jpg" class="img-fluid" alt="Chef Gordon Ramsay">
-                    </a>
-                    <div class="member-content">
-                        <h4>
-                            <a href="https://en.wikipedia.org/wiki/Sarah_(given_name)" target="_blank">Gordon Ramsay</a>
-                        </h4>
-                        <span>Passier</span>
-                        <p>
-                            Known for her exquisite desserts and pastries, Sarah adds sweetness and creativity to every plate.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
-                <div class="chef-member" data-aos="zoom-in" data-aos-delay="300">
-                    <a href="https://en.wikipedia.org/wiki/William_Anderson_(naval_officer)" target="_blank">
-                        <img src="~/assets/img/chefs/chefs-3.jpg" class="img-fluid" alt="Chef William Anderson">
-                    </a>
-                    <div class="member-content">
-                        <h4>
-                            <a href="https://en.wikipedia.org/wiki/William_Anderson_(naval_officer)" target="_blank">William Anderson</a>
-                        </h4>
-                        <span>Cook</span>
-                        <p>
-                            William specializes in grilled and savory dishes, delivering bold flavors that keep guests coming back.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
     </div>
 </section>
-

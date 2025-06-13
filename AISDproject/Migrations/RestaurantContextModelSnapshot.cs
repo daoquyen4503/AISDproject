@@ -44,9 +44,6 @@ namespace AISDproject.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
-
                     b.HasKey("MenuItemId");
 
                     b.ToTable("MenuItems");

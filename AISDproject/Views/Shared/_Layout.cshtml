@@ -33,18 +33,10 @@
                 <ul>
                     <li><a class="nav-link scrollto active" asp-controller="Home" asp-action="Index">Home</a></li>
                     <li><a class="nav-link scrollto" href="#about">About</a></li>
-                    <li><a class="nav-link scrollto" href="#events">Events</a></li>
+                    @* <li><a class="nav-link scrollto" href="#events">Events</a></li> *@
                     <li><a class="nav-link scrollto" href="#chefs">Chefs</a></li>
-                    <li><a class="nav-link scrollto" href="#gallery">Gallery</a></li>
+                    @* <li><a class="nav-link scrollto" href="#gallery">Gallery</a></li> *@
                     <li><a class="nav-link scrollto" asp-controller="MenuItems" asp-action="Index">Menu</a></li>
-                    @* <li class="dropdown"> *@
-                    @*     <a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a> *@
-                    @*     <ul> *@
-                    @*         <li><a href="#">Drop Down 1</a></li> *@
-                    @*         <li><a href="#">Drop Down 2</a></li> *@
-                    @*         <li><a href="#">Drop Down 3</a></li> *@
-                    @*     </ul> *@
-                    @* </li> *@
                     <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
@@ -60,7 +52,6 @@
         @RenderBody()
     </main>
 
-    <!-- ======= Footer ======= -->
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer mt-auto bg-dark text-white-50">
         <div class="container py-3 text-center">
