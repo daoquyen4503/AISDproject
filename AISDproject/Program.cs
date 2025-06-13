@@ -26,6 +26,9 @@ builder.Services.AddScoped<IStaffService, StaffService>();
 builder.Services.AddScoped<ITableRepository, TableRepository>();
 builder.Services.AddScoped<ITableService, TableService>();
 
+// them vao de chay timeslot
+builder.Services.AddScoped<ITimeSlotService, TimeSlotService>();
+
 // Đăng ký DbContext ở đây
 builder.Services.AddDbContext<RestaurantContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

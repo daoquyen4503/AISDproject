@@ -1,51 +1,119 @@
 ﻿@model AISDproject.Models.MenuItem
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Menu Item";
 }
 
-<h1>Create Menu Item</h1>
+<style>
+    .form-wrapper {
+        max-width: 650px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        padding: 40px;
+    }
 
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create" method="post" enctype="multipart/form-data">
-            @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    .form-label {
+        font-weight: 600;
+        color: #343a40;
+    }
 
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        height: 44px;
+        font-size: 14px;
+    }
 
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
+    .btn-danger-custom {
+        background-color: #c92a2a;
+        border: none;
+        padding: 10px 26px;
+        border-radius: 50px;
+        font-weight: 500;
+    }
 
-            <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
+        .btn-danger-custom:hover {
+            background-color: #a61e1e;
+        }
 
-            <div class="form-group">
-                <label asp-for="ImageFile" class="control-label">Ảnh món ăn</label>
-                <input asp-for="ImageFile" type="file" class="form-control-file" />
-                <span asp-validation-for="ImageFile" class="text-danger"></span>
-            </div>
+    .btn-outline-secondary-custom {
+        padding: 10px 22px;
+        border-radius: 50px;
+        font-weight: 500;
+    }
 
-            <div class="form-group mt-3">
-                <input type="submit" value="Create" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-            </div>
-        </form>
+    .section-title {
+        font-size: 28px;
+        font-weight: 700;
+        text-align: center;
+        color: #1d3557;
+        margin-bottom: 30px;
+    }
+</style>
+
+<section class="py-5 bg-light mb-5">
+    <div class="container">
+        <div class="form-wrapper">
+            <h2 class="section-title">Add New Menu Item</h2>
+
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <!-- Name -->
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Dish name..." />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <input asp-for="Description" class="form-control" placeholder="Brief description..." />
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+
+                <!-- Price -->
+                <div class="mb-3">
+                    <label asp-for="Price" class="form-label">Price</label>
+                    <input asp-for="Price" class="form-control" placeholder="e.g. 49.99" />
+                    <span asp-validation-for="Price" class="text-danger small"></span>
+                </div>
+
+                <!-- Image Upload -->
+                <div class="mb-3">
+                    <label asp-for="ImageFile" class="form-label">Upload Image</label>
+                    <input asp-for="ImageFile" type="file" class="form-control" />
+                    <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                </div>
+
+                <!-- Status Dropdown -->
+                <div class="mb-4">
+                    <label asp-for="Status" class="form-label">Status</label>
+                    <select asp-for="Status" class="form-select">
+                        <option value="true">Available</option>
+                        <option value="false">Unavailable</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger small"></span>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary-custom btn-outline-secondary">
+                        ← Back
+                    </a>
+                    <button type="submit" class="btn btn-danger-custom">
+                        <i class="bi bi-plus-circle me-1"></i> Create
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+</section>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }
