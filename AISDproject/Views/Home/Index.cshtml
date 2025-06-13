@@ -1,8 +1,118 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
+<!-- ======= Hero Section ======= -->
+<section id="hero" class="d-flex align-items-center">
+    <div class="container position-relative text-center text-lg-start" data-aos="zoom-in" data-aos-delay="100">
+        <div class="row">
+            <div class="col-lg-6 d-flex flex-column justify-content-center">
+                <h1>Enjoy Your <span>Healthy</span> Delicious Food</h1>
+                <h2>We are team of talented chefs bringing great food to your table</h2>
+                <div class="d-flex mt-4">
+                    <a asp-controller="Reservation" asp-action="Create" class="btn-book animate__animated animate__fadeInUp scrollto">Book a Table</a>
+                    <a href="https://www.youtube.com/" class="glightbox btn-watch-video d-flex align-items-center">
+                        <i class="bi bi-play-circle"></i><span>Watch Video</span>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 hero-img">
+                <img src="~/assets/img/menu/menu-item-1.png" class="img-fluid animated" alt="Hero Image">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ======= About Section ======= -->
+<section id="about" class="about">
+    <div class="container" data-aos="fade-up">
+        <div class="row">
+            <div class="col-lg-6 order-1 order-lg-2" data-aos="zoom-in" data-aos-delay="100">
+                <div class="about-img">
+                    <img src="~/assets/img/about.jpg" class="img-fluid" alt="About us">
+                </div>
+            </div>
+            <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1 content">
+                <h3>Learn More <span>About Us</span></h3>
+                <p class="fst-italic">
+                    We are passionate about delivering delicious, healthy, and unforgettable meals to our guests.
+                </p>
+                <ul>
+                    <li><i class="bi bi-check-circle"></i> Fresh ingredients sourced locally every day.</li>
+                    <li><i class="bi bi-check-circle"></i> Dishes inspired by tradition, crafted with creativity.</li>
+                    <li><i class="bi bi-check-circle"></i> Cozy dining experience in the heart of the city.</li>
+                </ul>
+                <p>
+                    Whether you're dining in or ordering for takeout, AISD Restaurant is dedicated to ensuring that every dish is prepared with care and attention to detail.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ======= Specials Section ======= -->
+<section id="specials" class="specials">
+    <div class="container" data-aos="fade-up">
+        <div class="section-title">
+            <h2>Specials</h2>
+            <p>Check Our Specials</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <ul class="nav nav-tabs flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active show" data-bs-toggle="tab" href="#tab-1">Grilled Chicken</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#tab-2">Seafood Pasta</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#tab-3">Vegetarian Delight</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-8 mt-4 mt-lg-0">
+                <div class="tab-content">
+                    <div class="tab-pane active show" id="tab-1">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <img src="~/assets/img/menu/menu-item-2.png" alt="" class="img-fluid">
+                            </div>
+                            <div class="col-lg-6 details">
+                                <h3>Grilled Chicken</h3>
+                                <p class="fst-italic">Perfectly marinated and grilled chicken served with veggies.</p>
+                                <p>Our grilled chicken is prepared with house-made spices and accompanied by seasonal vegetables for a delightful experience.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-2">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <img src="~/assets/img/menu/menu-item-3.png" alt="" class="img-fluid">
+                            </div>
+                            <div class="col-lg-6 details">
+                                <h3>Seafood Pasta</h3>
+                                <p class="fst-italic">Prawns and squid tossed in creamy tomato sauce over fettuccine.</p>
+                                <p>A customer favorite! Our pasta is made fresh daily and served hot with parmesan and herbs.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-3">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <img src="~/assets/img/menu/menu-item-4.png" alt="" class="img-fluid">
+                            </div>
+                            <div class="col-lg-6 details">
+                                <h3>Vegetarian Delight</h3>
+                                <p class="fst-italic">A healthy mix of vegetables sautéed in olive oil and fresh herbs.</p>
+                                <p>Fresh, light and full of flavor — this dish is a perfect option for vegetarians and healthy eaters alike.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
