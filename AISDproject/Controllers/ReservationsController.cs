@@ -6,11 +6,11 @@ using AISDproject.Services;
 
 namespace AISDproject.Controllers
 {
-    public class ReservationController : Controller
+    public class ReservationsController : Controller
     {
         private readonly IReservationService _reservationService;
 
-        public ReservationController(IReservationService reservationService)
+        public ReservationsController(IReservationService reservationService)
         {
             _reservationService = reservationService;
         }

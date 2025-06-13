@@ -1,35 +1,71 @@
 ﻿@model AISDproject.Models.Table
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Table";
 }
 
-<h1>Create</h1>
+<style>
+    .create-bg {
+        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/images/table-background.jpg') center/cover no-repeat;
+        padding: 60px 0;
+    }
 
-<h4>Table</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="TableName" class="control-label"></label>
-                <input asp-for="TableName" class="form-control" />
-                <span asp-validation-for="TableName" class="text-danger"></span>
+    .card-create {
+        background-color: #ffffffee;
+        border-radius: 20px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+
+    .form-icon {
+        font-size: 24px;
+        margin-right: 8px;
+        color: #dc3545;
+    }
+</style>
+
+<section class="create-bg">
+    <div class="container" data-aos="fade-up">
+        <div class="text-center text-white mb-5">
+            <h2 class="fw-bold display-6">✨ Add a New Table ✨</h2>
+            <p class="lead">Organize your restaurant more efficiently by adding tables to the system</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card card-create p-4" data-aos="zoom-in">
+                    <form asp-action="Create" method="post" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="TableName" class="form-label fw-semibold">
+                                <i class="bi bi-grid form-icon"></i>Table Name
+                            </label>
+                            <input asp-for="TableName" class="form-control rounded-pill px-3" placeholder="E.g. T01, VIP2" />
+                            <span asp-validation-for="TableName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Capacity" class="form-label fw-semibold">
+                                <i class="bi bi-people form-icon"></i>Capacity
+                            </label>
+                            <input asp-for="Capacity" class="form-control rounded-pill px-3" placeholder="E.g. 4, 6, 10" />
+                            <span asp-validation-for="Capacity" class="text-danger small"></span>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-danger rounded-pill px-4 py-2 shadow">
+                                <i class="bi bi-plus-circle me-2"></i> Create Table
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="mt-4 text-center">
+                        <a asp-action="Index" class="btn btn-outline-dark rounded-pill">
+                            ← Back to Table List
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Capacity" class="control-label"></label>
-                <input asp-for="Capacity" class="form-control" />
-                <span asp-validation-for="Capacity" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
+</section>
