@@ -1,47 +1,62 @@
-﻿@model IEnumerable<AISDproject.Models.Order>
+﻿@model IEnumerable<AISDproject.ViewModels.OrderDetailViewModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Orders";
 }
 
-<h1>Index</h1>
+<h1>Order List</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
+<table class="table table-bordered">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.OrderTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Table)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Staff)
-            </th>
-            <th></th>
+            <th>Order ID</th>
+            <th>Table</th>
+            <th>Staff</th>
+            <th>Order Time</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+            <th>Payment</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.OrderTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Table.TableId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Staff.FullName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.OrderId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.OrderId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.OrderId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var order in Model)
+        {
+            <tr class="@(order.PaymentStatus == AISDproject.Models.PaymentStatus.Paid ? "" : "table-warning")">
+                <td>@order.OrderId</td>
+                <td>@order.TableName</td>
+                <td>@order.StaffName</td>
+                <td>@order.OrderTime.ToString("g")</td>
+                <td>@order.TotalAmount.ToString("N0") VND</td>
+                <td>@order.Status</td>
+                <td>
+                    @switch (order.PaymentStatus)
+                    {
+                        case AISDproject.Models.PaymentStatus.Paid:
+                            <span class="text-success">Đã thanh toán</span>
+                            break;
+                        case AISDproject.Models.PaymentStatus.Pending:
+                            <span class="text-danger">Chưa thanh toán</span>
+                            break;
+                        default:
+                            <span class="text-muted">Không xác định</span>
+                            break;
+                    }
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@order.OrderId">Details</a> |
+                    <a asp-action="Edit" asp-route-id="@order.OrderId">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@order.OrderId">Delete</a>
+                    @if (order.PaymentStatus == AISDproject.Models.PaymentStatus.Pending)
+                    {
+                        <div class="mt-1">
+                            <a asp-action="Checkout" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-primary">Thanh toán</a>
+                        </div>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<a asp-action="Create" class="btn btn-primary">Create New Order</a>

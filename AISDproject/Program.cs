@@ -14,9 +14,6 @@ builder.Services.AddScoped<IMenuItemService, MenuItemService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
-builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-builder.Services.AddScoped<IPaymentService, PaymentService>();
-
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 
@@ -28,6 +25,7 @@ builder.Services.AddScoped<ITableService, TableService>();
 
 // them vao de chay timeslot
 builder.Services.AddScoped<ITimeSlotService, TimeSlotService>();
+
 
 // Đăng ký DbContext ở đây
 builder.Services.AddDbContext<RestaurantContext>(options =>

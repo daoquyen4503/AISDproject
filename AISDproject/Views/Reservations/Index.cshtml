@@ -1,59 +1,47 @@
 ﻿@model IEnumerable<AISDproject.Models.Reservation>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Reservation List";
 }
 
-<h1>Index</h1>
+<h1>Reservation List</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
 </p>
-<table class="table">
+
+<table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CustomerName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PhoneNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReservationDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Table)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TimeSlot)
-            </th>
-            <th></th>
+            <th>Customer Name</th>
+            <th>Phone Number</th>
+            <th>Date</th>
+            <th>Table</th>
+            <th>Time Slot</th>
+            <th>Status</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustomerName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PhoneNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReservationDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Table.TableId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TimeSlot.TimeSlotId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ReservationId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ReservationId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ReservationId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.CustomerName</td>
+                <td>@item.PhoneNumber</td>
+                <td>@item.ReservationDate.ToString("dd/MM/yyyy")</td>
+                <td>@item.Table?.TableName</td>
+                <td>
+                    @item.TimeSlot?.StartTime.ToString(@"hh\:mm")
+                    -
+                    @item.TimeSlot?.EndTime.ToString(@"hh\:mm")
+                </td>
+                <td>@item.Status</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ReservationId" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.ReservationId" class="btn btn-sm btn-info">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.ReservationId" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

@@ -1,40 +1,45 @@
 ﻿@model AISDproject.ViewModels.OrderCreateViewModel
 
 @{
-    ViewData["Title"] = "Create Order";
+    ViewData["Title"] = "Tạo đơn hàng";
 
-    var menuItemsJson = System.Text.Json.JsonSerializer.Serialize(
-        Model.MenuItems?.ToDictionary(m => m.MenuItemId, m => m.Price) ?? new Dictionary<int, decimal>()
+    var menuPricesJson = System.Text.Json.JsonSerializer.Serialize(
+        Model.MenuItems.ToDictionary(m => m.MenuItemId, m => m.Price)
     );
-
-    var menuOptionsHtml = string.Join("", Model.MenuItemList.Select(item =>
-        $"<option value='{item.Value}'>{item.Text}</option>"));
+    var menuOptionsHtml = string.Join("",
+        Model.MenuItemList.Select(m => $"<option value='{m.Value}'>{m.Text}</option>"));
 }
 
-<h1>Create Order</h1>
+<h2>@ViewData["Title"]</h2>
 
-<form asp-action="Create" method="post">
+<form asp-controller="Orders" asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
     <div class="form-group">
-        <label asp-for="TableId" class="control-label"></label>
-        <select asp-for="TableId" asp-items="Model.TableList" class="form-control"></select>
+        <label asp-for="TableId"></label>
+        <select asp-for="TableId" asp-items="Model.TableList" class="form-control">
+            <option value="">-- Chọn bàn --</option>
+        </select>
         <span asp-validation-for="TableId" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="StaffId" class="control-label"></label>
-        <select asp-for="StaffId" asp-items="Model.StaffList" class="form-control"></select>
+        <label asp-for="StaffId"></label>
+        <select asp-for="StaffId" asp-items="Model.StaffList" class="form-control">
+            <option value="">-- Chọn nhân viên --</option>
+        </select>
         <span asp-validation-for="StaffId" class="text-danger"></span>
     </div>
 
     <h4>Order Items</h4>
-
     <table class="table" id="itemsTable">
         <thead>
             <tr>
-                <th>Menu Item</th>
-                <th>Quantity</th>
+                <th>Món ăn</th>
+                <th>Đơn giá</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
                 <th></th>
             </tr>
         </thead>
@@ -43,85 +48,92 @@
             {
                 <tr>
                     <td>
-                        <select asp-for="Items[@i].MenuItemId" asp-items="Model.MenuItemList" class="form-control item-select"></select>
+                        <select name="Items[@i].MenuItemId" class="form-control menu-select" data-index="@i">
+                            <option value="">-- Chọn món --</option>
+                            @foreach (var opt in Model.MenuItemList)
+                            {
+                                <option value="@opt.Value" selected="@(opt.Value == Model.Items[i].MenuItemId.ToString() ? "selected" : null)">@opt.Text</option>
+                            }
+                        </select>
                         <span asp-validation-for="Items[@i].MenuItemId" class="text-danger"></span>
                     </td>
+                    <td><span class="price" data-index="@i">0</span></td>
                     <td>
-                        <input asp-for="Items[@i].Quantity" class="form-control qty-input" />
+                        <input name="Items[@i].Quantity" type="number" min="1" class="form-control quantity-input" data-index="@i" value="@Model.Items[i].Quantity" />
                         <span asp-validation-for="Items[@i].Quantity" class="text-danger"></span>
                     </td>
-                    <td>
-                        <button type="button" class="btn btn-danger" onclick="removeRow(this)">X</button>
-                    </td>
+                    <td><span class="line-total" data-index="@i">0</span></td>
+                    <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">X</button></td>
                 </tr>
             }
         </tbody>
     </table>
 
-    <button type="button" class="btn btn-secondary" onclick="addRow()">+ Add Item</button>
+    <button type="button" class="btn btn-secondary" id="add-item">+ Thêm món</button>
 
-    <div class="mt-3">
-        <strong>Tổng tiền: </strong><span id="total-amount">0</span> ₫
-        <input type="hidden" name="TotalAmount" id="TotalAmount" value="0" />
+    <div class="form-group mt-3">
+        <strong>Tổng cộng: </strong><span id="total-amount">0</span> ₫
+        <input type="hidden" asp-for="TotalAmount" id="TotalAmount" />
     </div>
 
-    <button type="submit" class="btn btn-primary mt-2">Create Order</button>
+    <button type="submit" class="btn btn-primary">Tạo đơn hàng</button>
+    <a asp-action="Index" class="btn btn-link">Quay lại</a>
 </form>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
-        const prices = @Html.Raw(menuItemsJson);
+        const prices = @Html.Raw(menuPricesJson);
         const menuOptions = `@Html.Raw(menuOptionsHtml)`;
+        let idx = @Model.Items.Count;
 
+        function updateLine(i) {
+            const sel = document.querySelector(`.menu-select[data-index="${i}"]`);
+            const qty = document.querySelector(`.quantity-input[data-index="${i}"]`);
+            const price = prices[sel.value] || 0;
+            document.querySelector(`.price[data-index="${i}"]`).textContent = price.toLocaleString();
+            const total = price * (parseInt(qty.value) || 0);
+            document.querySelector(`.line-total[data-index="${i}"]`).textContent = total.toLocaleString();
+            updateTotal();
+        }
         function updateTotal() {
-            let total = 0;
-            document.querySelectorAll("#itemsTable tbody tr").forEach(row => {
-                const menuItemId = row.querySelector(".item-select").value;
-                const qty = parseInt(row.querySelector(".qty-input").value) || 0;
-                const price = prices[menuItemId] || 0;
-                total += price * qty;
-            });
-            document.getElementById("total-amount").textContent = total.toLocaleString();
-            document.getElementById("TotalAmount").value = total;
+            let sum = 0;
+            document.querySelectorAll('.line-total').forEach(s => sum += parseInt(s.textContent.replace(/,/g,'')) || 0);
+            document.getElementById('total-amount').textContent = sum.toLocaleString();
+            document.getElementById('TotalAmount').value = sum;
         }
+        function removeRow(btn) { btn.closest('tr').remove(); updateTotal(); }
 
-        function addRow() {
-            const index = document.querySelectorAll("#itemsTable tbody tr").length;
-            const row = `
-                <tr>
-                    <td>
-                        <select name="Items[${index}].MenuItemId" class="form-control item-select">
-                            ${menuOptions}
-                        </select>
-                        <span class="text-danger field-validation-valid" data-valmsg-for="Items[${index}].MenuItemId" data-valmsg-replace="true"></span>
-                    </td>
-                    <td>
-                        <input name="Items[${index}].Quantity" class="form-control qty-input" value="1" />
-                        <span class="text-danger field-validation-valid" data-valmsg-for="Items[${index}].Quantity" data-valmsg-replace="true"></span>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-danger" onclick="removeRow(this)">X</button>
-                    </td>
-                </tr>`;
-            document.querySelector("#itemsTable tbody").insertAdjacentHTML("beforeend", row);
-            updateTotal();
-        }
+        document.querySelectorAll('.menu-select').forEach(el => el.addEventListener('change', e => updateLine(e.target.dataset.index)));
+        document.querySelectorAll('.quantity-input').forEach(el => el.addEventListener('input', e => updateLine(e.target.dataset.index)));
 
-        function removeRow(btn) {
-            btn.closest("tr").remove();
-            updateTotal();
-        }
-
-        document.addEventListener("input", function (e) {
-            if (e.target.classList.contains("item-select") || e.target.classList.contains("qty-input")) {
-                updateTotal();
-            }
+        document.getElementById('add-item').addEventListener('click', () => {
+            const tbody = document.querySelector('#itemsTable tbody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>
+                    <select name="Items[${idx}].MenuItemId" class="form-control menu-select" data-index="${idx}">
+                        <option value="">-- Chọn món --</option>${menuOptions}
+                    </select>
+                    <span class="text-danger field-validation-valid" data-valmsg-for="Items[${idx}].MenuItemId" data-valmsg-replace="true"></span>
+                </td>
+                <td><span class="price" data-index="${idx}">0</span></td>
+                <td>
+                    <input name="Items[${idx}].Quantity" class="form-control quantity-input" data-index="${idx}" type="number" min="1" value="1" />
+                    <span class="text-danger field-validation-valid" data-valmsg-for="Items[${idx}].Quantity" data-valmsg-replace="true"></span>
+                </td>
+                <td><span class="line-total" data-index="${idx}">0</span></td>
+                <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">X</button></td>
+            `;
+            tbody.appendChild(row);
+            document.querySelector(`.menu-select[data-index="${idx}"]`).addEventListener('change', () => updateLine(idx));
+            document.querySelector(`.quantity-input[data-index="${idx}"]`).addEventListener('input', () => updateLine(idx));
+            idx++;
         });
 
-        document.addEventListener("DOMContentLoaded", updateTotal);
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTotal();
+            for (let i = 0; i < idx; i++) updateLine(i);
+        });
     </script>
 }

@@ -10,6 +10,7 @@ namespace AISDproject.Services
         Task UpdateAsync(TimeSlot timeSlot);
         Task DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
+        
     }
 
 }

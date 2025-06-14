@@ -1,6 +1,7 @@
 ﻿using AISDproject.Models;
 using AISDproject.Repositeries;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections;
 
 namespace AISDproject.Services.Implementation
 {
@@ -48,6 +49,5 @@ namespace AISDproject.Services.Implementation
                 Text = $"Table {t.TableName}" // Hoặc t.Name nếu có
             });
         }
-
     }
 }

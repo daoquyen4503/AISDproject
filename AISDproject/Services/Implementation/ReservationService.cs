@@ -1,5 +1,6 @@
 ﻿using AISDproject.Models;
 using AISDproject.Repositeries;
+using Microsoft.EntityFrameworkCore;
 
 namespace AISDproject.Services.Implementation
 {
@@ -24,6 +25,7 @@ namespace AISDproject.Services.Implementation
         public async Task CreateReservationAsync(Reservation reservation)
         {
             await _repository.AddAsync(reservation);
+            
         }
 
         public async Task UpdateReservationAsync(Reservation reservation)

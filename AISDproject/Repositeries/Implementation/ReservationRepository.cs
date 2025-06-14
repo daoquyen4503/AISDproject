@@ -31,14 +31,30 @@ namespace AISDproject.Repositeries.Implementation
         public async Task AddAsync(Reservation reservation)
         {
             _context.Reservations.Add(reservation);
+
+            // Log kiểm tra
+            Console.WriteLine($"📝 Add reservation: {reservation.CustomerName}, {reservation.ReservationDate}");
+
             await _context.SaveChangesAsync();
         }
 
+
         public async Task UpdateAsync(Reservation reservation)
         {
-            _context.Reservations.Update(reservation);
-            await _context.SaveChangesAsync();
+            var existing = await _context.Reservations.FindAsync(reservation.ReservationId);
+            if (existing != null)
+            {
+                existing.CustomerName = reservation.CustomerName;
+                existing.PhoneNumber = reservation.PhoneNumber;
+                existing.ReservationDate = reservation.ReservationDate;
+                existing.TableId = reservation.TableId;
+                existing.TimeSlotId = reservation.TimeSlotId;
+                existing.Status = reservation.Status; // ✅ Quan trọng
+
+                await _context.SaveChangesAsync();
+            }
         }
+
 
         public async Task DeleteAsync(int id)
         {

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AISDproject.Models
 {
@@ -14,5 +15,8 @@ namespace AISDproject.Models
         public TimeSpan EndTime { get; set; }
 
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+
+        [NotMapped]
+        public string DisplayTime => $"{StartTime:hh\\:mm} - {EndTime:hh\\:mm}";
     }
 }

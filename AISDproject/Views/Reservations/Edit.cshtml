@@ -29,15 +29,25 @@
                 <span asp-validation-for="ReservationDate" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="TableId" class="control-label"></label>
-                <select asp-for="TableId" class="form-control" asp-items="ViewBag.TableId"></select>
-                <span asp-validation-for="TableId" class="text-danger"></span>
+                @Html.LabelFor(model => model.TableId)
+                @Html.DropDownListFor(model => model.TableId, ViewBag.Tables as SelectList, "-- Select Table --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.TableId)
             </div>
+
             <div class="form-group">
-                <label asp-for="TimeSlotId" class="control-label"></label>
-                <select asp-for="TimeSlotId" class="form-control" asp-items="ViewBag.TimeSlotId"></select>
-                <span asp-validation-for="TimeSlotId" class="text-danger"></span>
+                @Html.LabelFor(model => model.TimeSlotId)
+                @Html.DropDownListFor(model => model.TimeSlotId, ViewBag.TimeSlots as SelectList, "-- Select Time Slot --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.TimeSlotId)
             </div>
+
+            <div class="form-group">
+                <label asp-for="Status" class="control-label"></label>
+                <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<ReservationStatus>()">
+                    <option value="">-- Select Status --</option>
+                </select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>

@@ -16,5 +16,6 @@ namespace AISDproject.Services
         Task<IEnumerable<Table>> GetTablesAsync();
         Task<IEnumerable<Staff>> GetStaffsAsync();
         Task<IEnumerable<MenuItem>> GetMenuItemsAsync();
+        Task CreateOrderAsync(Order order);
     }
 }
