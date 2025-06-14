@@ -1,0 +1,33 @@
+﻿@model AISDproject.ViewModels.CheckoutViewModel
+@{
+    ViewData["Title"] = "Thanh toán đơn hàng";
+}
+
+<h2>Thanh toán đơn hàng #@ViewBag.OrderId</h2>
+<p><strong>Bàn:</strong> @ViewBag.TableName</p>
+<p><strong>Tổng tiền:</strong> @(((decimal)ViewBag.TotalAmount).ToString("N0")) đ</p>
+
+<form asp-action="Checkout" method="post">
+    <input type="hidden" asp-for="OrderId" />
+
+    <div class="form-group">
+        <label>Phương thức thanh toán</label>
+        <select asp-for="PaymentMethod" class="form-control">
+            <option value="">-- Chọn --</option>
+            @foreach (var method in Enum.GetValues(typeof(AISDproject.Models.PaymentMethod)))
+            {
+                <option value="@method">@method</option>
+            }
+        </select>
+        <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Xác nhận thanh toán</button>
+    <a asp-action="Details" asp-route-id="@Model.OrderId" class="btn btn-secondary">Hủy</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
