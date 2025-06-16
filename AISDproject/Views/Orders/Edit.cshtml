@@ -1,5 +1,8 @@
 ﻿@model AISDproject.ViewModels.OrderEditViewModel
 @{
+    var menuPricesJson = System.Text.Json.JsonSerializer.Serialize(
+        Model.MenuItems.ToDictionary(m => m.MenuItemId, m => m.Price)
+    );
     ViewData["Title"] = "Edit Order";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -13,6 +16,7 @@
 
         <form asp-action="Edit" method="post" class="card shadow p-4 rounded-4 border-0">
             <input type="hidden" asp-for="OrderId" />
+            <input type="hidden" asp-for="TotalAmount" /> <!-- ✅ Thêm dòng này -->
 
             <div class="mb-3">
                 <label asp-for="TableId" class="form-label fw-semibold">Table</label>
@@ -55,14 +59,14 @@
                                 </td>
                                 <td>@price.ToString("N0") đ</td>
                                 <td><input asp-for="Items[@i].Quantity" class="form-control text-center" /></td>
-                                <td>@(price * Model.Items[i].Quantity).ToString("N0") đ</td>
+                                <td>@((price * Model.Items[i].Quantity).ToString("N0")) đ</td>
                             </tr>
                         }
                     </tbody>
                     <tfoot>
                         <tr>
                             <td colspan="3" class="text-end"><strong>Total:</strong></td>
-                            <td><strong>@Model.TotalAmount.ToString("N0") đ</strong></td>
+                            <td><strong id="total-display">@Model.TotalAmount.ToString("N0") đ</strong></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -72,5 +76,43 @@
                 <button type="submit" class="btn btn-danger rounded-pill px-4">💾 Save</button>
             </div>
         </form>
+
+        <script>
+            const menuPrices = @Html.Raw(menuPricesJson);
+
+            function updateTotals() {
+                let total = 0;
+                const rows = document.querySelectorAll("tbody tr");
+
+                rows.forEach((row, index) => {
+                    const select = row.querySelector(`select[name="Items[${index}].MenuItemId"]`);
+                    const qtyInput = row.querySelector(`input[name="Items[${index}].Quantity"]`);
+                    const priceCell = row.children[1];
+                    const subtotalCell = row.children[3];
+
+                    const menuItemId = select.value;
+                    const quantity = parseInt(qtyInput.value) || 0;
+                    const price = menuPrices[menuItemId] || 0;
+                    const subtotal = price * quantity;
+
+                    priceCell.textContent = price.toLocaleString() + " đ";
+                    subtotalCell.textContent = subtotal.toLocaleString() + " đ";
+
+                    total += subtotal;
+                });
+
+                document.getElementById("total-display").textContent = total.toLocaleString() + " đ";
+                document.querySelector("input[name='TotalAmount']").value = total;
+            }
+
+            window.addEventListener('DOMContentLoaded', function () {
+                updateTotals();
+
+                document.querySelectorAll("select, input[type='number'], input[type='text']").forEach(input => {
+                    input.addEventListener("change", updateTotals);
+                });
+            });
+        </script>
+
     </div>
 </section>

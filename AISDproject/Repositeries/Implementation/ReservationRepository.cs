@@ -7,6 +7,7 @@ namespace AISDproject.Repositeries.Implementation
     public class ReservationRepository : IReservationRepository
     {
         private readonly RestaurantContext _context;
+
         public ReservationRepository(RestaurantContext context)
         {
             _context = context;
@@ -38,7 +39,6 @@ namespace AISDproject.Repositeries.Implementation
             await _context.SaveChangesAsync();
         }
 
-
         public async Task UpdateAsync(Reservation reservation)
         {
             var existing = await _context.Reservations.FindAsync(reservation.ReservationId);
@@ -55,7 +55,6 @@ namespace AISDproject.Repositeries.Implementation
             }
         }
 
-
         public async Task DeleteAsync(int id)
         {
             var reservation = await _context.Reservations.FindAsync(id);
@@ -65,5 +64,19 @@ namespace AISDproject.Repositeries.Implementation
                 await _context.SaveChangesAsync();
             }
         }
+
+        // ✅ THÊM MỚI: Lấy danh sách tất cả bàn
+        public async Task<List<Table>> GetAllTablesAsync()
+        {
+            return await _context.Tables.ToListAsync();
+        }
+
+        // ✅ THÊM MỚI: Lấy danh sách tất cả khung giờ (TimeSlot)
+        public async Task<List<TimeSlot>> GetAllTimeSlotsAsync()
+        {
+            return await _context.TimeSlots.ToListAsync();
+        }
+
+
     }
 }

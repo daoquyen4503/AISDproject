@@ -22,7 +22,7 @@ namespace AISDproject.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var timeSlots = await _service.GetAllAsync();
+            var timeSlots = await _service.GetAllTimeSlotsAsync();
             return View(timeSlots);
         }
 

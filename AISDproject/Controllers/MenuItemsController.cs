@@ -4,17 +4,21 @@ using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using System.Threading.Tasks;
 using AISDproject.Filters; // Thêm namespace cho filter
+using Microsoft.AspNetCore.Mvc.Rendering; // để dùng SelectList
+using AISDproject.Data; // thêm dòng này để dùng RestaurantContext
 
 namespace AISDproject.Controllers
 {
-    [AuthorizeRole("Admin", "Manager")]
+    
     public class MenuItemsController : Controller
     {
         private readonly IMenuItemService _service;
+        private readonly RestaurantContext _context; // thêm dòng này
 
-        public MenuItemsController(IMenuItemService service)
+        public MenuItemsController(IMenuItemService service, RestaurantContext context) // sửa constructor
         {
             _service = service;
+            _context = context;
         }
 
         // GET: MenuItems
@@ -24,19 +28,25 @@ namespace AISDproject.Controllers
             return View(items);
         }
 
+        [AuthorizeRole("Admin", "Manager")]
         // GET: MenuItems/Create
         public IActionResult Create()
         {
+            ViewBag.CategoryId = new SelectList(_context.Categories, "CategoryId", "Name");
             return View();
         }
 
+        [AuthorizeRole("Admin", "Manager")]
         // POST: MenuItems/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(MenuItem item)
         {
             if (!ModelState.IsValid)
+            {
+                ViewBag.CategoryId = new SelectList(_context.Categories, "CategoryId", "Name", item.CategoryId);
                 return View(item);
+            }
 
             if (item.ImageFile != null && item.ImageFile.Length > 0)
             {
@@ -58,6 +68,7 @@ namespace AISDproject.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [AuthorizeRole("Admin", "Manager")]
         // GET: MenuItems/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
@@ -65,16 +76,21 @@ namespace AISDproject.Controllers
             if (item == null)
                 return NotFound();
 
+            ViewBag.CategoryId = new SelectList(_context.Categories, "CategoryId", "Name", item.CategoryId);
             return View(item);
         }
 
+        [AuthorizeRole("Admin", "Manager")]
         // POST: MenuItems/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(MenuItem item)
         {
             if (!ModelState.IsValid)
+            {
+                ViewBag.CategoryId = new SelectList(_context.Categories, "CategoryId", "Name", item.CategoryId);
                 return View(item);
+            }
 
             if (item.ImageFile != null && item.ImageFile.Length > 0)
             {
@@ -96,6 +112,7 @@ namespace AISDproject.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [AuthorizeRole("Admin", "Manager")]
         // GET: MenuItems/Details/5
         public async Task<IActionResult> Details(int id)
         {
@@ -106,6 +123,7 @@ namespace AISDproject.Controllers
             return View(item);
         }
 
+        [AuthorizeRole("Admin", "Manager")]
         // GET: MenuItems/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
@@ -116,6 +134,7 @@ namespace AISDproject.Controllers
             return View(item);
         }
 
+        [AuthorizeRole("Admin", "Manager")]
         // POST: MenuItems/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

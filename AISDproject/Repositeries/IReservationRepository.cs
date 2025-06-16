@@ -9,6 +9,8 @@ namespace AISDproject.Repositeries
         Task AddAsync(Reservation reservation);
         Task UpdateAsync(Reservation reservation);
         Task DeleteAsync(int id);
+        Task<List<TimeSlot>> GetAllTimeSlotsAsync();
+
     }
 
 }

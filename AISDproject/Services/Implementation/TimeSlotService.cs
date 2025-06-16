@@ -1,6 +1,8 @@
 ﻿using AISDproject.Data;
 using AISDproject.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AISDproject.Services.Implementation
 {
@@ -13,8 +15,10 @@ namespace AISDproject.Services.Implementation
             _context = context;
         }
 
-        public async Task<IEnumerable<TimeSlot>> GetAllAsync()
-            => await _context.TimeSlots.ToListAsync();
+        public async Task<List<TimeSlot>> GetAllTimeSlotsAsync() // ✅ Giữ đúng tên như interface
+        {
+            return await _context.TimeSlots.ToListAsync();
+        }
 
         public async Task<TimeSlot?> GetByIdAsync(int id)
             => await _context.TimeSlots.FindAsync(id);
@@ -44,5 +48,4 @@ namespace AISDproject.Services.Implementation
         public async Task<bool> ExistsAsync(int id)
             => await _context.TimeSlots.AnyAsync(t => t.TimeSlotId == id);
     }
-
 }
