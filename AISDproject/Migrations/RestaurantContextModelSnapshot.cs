@@ -22,6 +22,26 @@ namespace AISDproject.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("AISDproject.Models.Category", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("Categories");
+                });
+
             modelBuilder.Entity("AISDproject.Models.MenuItem", b =>
                 {
                     b.Property<int>("MenuItemId")
@@ -29,6 +49,9 @@ namespace AISDproject.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MenuItemId"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -44,7 +67,12 @@ namespace AISDproject.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
                     b.HasKey("MenuItemId");
+
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("MenuItems");
                 });
@@ -254,6 +282,17 @@ namespace AISDproject.Migrations
                     b.ToTable("TimeSlots");
                 });
 
+            modelBuilder.Entity("AISDproject.Models.MenuItem", b =>
+                {
+                    b.HasOne("AISDproject.Models.Category", "Category")
+                        .WithMany("MenuItems")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("AISDproject.Models.Order", b =>
                 {
                     b.HasOne("AISDproject.Models.Staff", "Staff")
@@ -320,6 +359,11 @@ namespace AISDproject.Migrations
                     b.Navigation("Table");
 
                     b.Navigation("TimeSlot");
+                });
+
+            modelBuilder.Entity("AISDproject.Models.Category", b =>
+                {
+                    b.Navigation("MenuItems");
                 });
 
             modelBuilder.Entity("AISDproject.Models.MenuItem", b =>

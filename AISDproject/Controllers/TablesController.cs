@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using AISDproject.Models;
 using AISDproject.Services;
+using AISDproject.Filters; // Thêm dòng này để sử dụng AuthorizeRole
 
 namespace AISDproject.Controllers
 {
+    [AuthorizeRole("Admin", "Manager", "Waiter")] // Gán quyền cho cả 3 vai trò
     public class TablesController : Controller
     {
         private readonly ITableService _tableService;

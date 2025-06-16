@@ -10,9 +10,13 @@ using AISDproject.Models;
 using AISDproject.Services;
 using AISDproject.ViewModels;
 using AISDproject.Data;
+using AISDproject.Filters;
 
 namespace AISDproject.Controllers
 {
+    [AuthorizeRole("Admin", "Waiter", "Cashier")] // ✅ Cho phép cả 3 vai trò
+
+    //[Route("Orders")]
     public class OrdersController : Controller
     {
         private readonly IOrderService _orderService;
