@@ -31,25 +31,41 @@
                 <ul>
                     <li><a class="nav-link scrollto active" asp-controller="Home" asp-action="Index">Home</a></li>
                     <li><a class="nav-link scrollto" href="#about">About</a></li>
+                    <li><a class="nav-link scrollto" href="#menu">Menu</a></li>
                     <li><a class="nav-link scrollto" href="#chefs">Chefs</a></li>
-                    <li><a class="nav-link scrollto" asp-controller="MenuItems" asp-action="Index">Menu</a></li>
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
             </nav>
 
-            <!-- Book a Table Button -->
-            <a asp-controller="Reservations" asp-action="Create" class="btn-book-a-table d-none d-lg-flex me-2">Book a Table</a>
+            <!-- Action Buttons: Book a Table + Login/Logout -->
+            <div class="d-none d-lg-flex align-items-center gap-3">
 
-            <!-- Logout button (hiện khi đã đăng nhập) -->
-            @if (User?.Identity?.IsAuthenticated == true)
-            {
-                <form asp-controller="Logout" asp-action="Index" method="post" class="d-none d-lg-flex">
-                    <button type="submit" class="btn btn-outline-danger">Logout</button>
-                </form>
-            }
+                <a asp-controller="Reservations" asp-action="Create"
+                   class="btn btn-danger rounded-pill px-4 py-2">
+                    Book a Table
+                </a>
+
+                @if (User?.Identity?.IsAuthenticated == true)
+                {
+                    <form asp-controller="Logout" asp-action="Index" method="post">
+                        <button type="submit" class="btn btn-outline-danger rounded-pill px-4 py-2">
+                            Logout
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Login" asp-action="Index"
+                       class="btn btn-outline-primary rounded-pill px-4 py-2">
+                        Login
+                    </a>
+                }
+
+            </div>
 
         </div>
     </header>
+
 
     <main id="main" style="margin-top: 100px;">
         @RenderBody()

@@ -1,5 +1,4 @@
-﻿@model IEnumerable<AISDproject.Models.MenuItem>
-
+﻿@model IEnumerable<AISDproject.Models.Category>
 @{
     ViewData["Title"] = "Home";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -53,56 +52,74 @@
     </div>
 </section>
 
-<!-- ======= Specials Section (Dynamic from MenuItems) ======= -->
-<section id="specials" class="specials">
+
+<!-- ======= Menu ======= -->
+<section id="menu" class="menu">
     <div class="container" data-aos="fade-up">
-        <div class="section-title">
+        <div class="section-title text-center">
             <h2>Menu</h2>
-            <p>Explore Our Dishes</p>
+            <p>Explore Our Dishes by Category</p>
         </div>
 
-        <div class="row">
-            <!-- Tab list -->
-            <div class="col-lg-4">
-                <ul class="nav nav-tabs flex-column">
-                    @for (int i = 0; i < Model.Count(); i++)
-                    {
-                        var item = Model.ElementAt(i);
-                        <li class="nav-item">
-                            <a class="nav-link @(i == 0 ? "active show" : "")" data-bs-toggle="tab" href="#tab-@i">
-                                @item.Name
-                            </a>
-                        </li>
-                    }
-                </ul>
-            </div>
+        <!-- Horizontal category tabs -->
+        <div class="text-center mb-4">
+            <ul class="nav nav-tabs justify-content-center border-0" id="categoryTabs" role="tablist">
+                @for (int i = 0; i < Model.Count(); i++)
+                {
+                    var cat = Model.ElementAt(i);
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link @(i == 0 ? "active" : "")"
+                           data-bs-toggle="tab"
+                           href="#cat-@cat.CategoryId"
+                           role="tab">
+                            @cat.Name
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
 
-            <!-- Tab content -->
-            <div class="col-lg-8 mt-4 mt-lg-0">
-                <div class="tab-content">
-                    @for (int i = 0; i < Model.Count(); i++)
-                    {
-                        var item = Model.ElementAt(i);
-                        <div class="tab-pane @(i == 0 ? "active show" : "")" id="tab-@i">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <img src="@item.ImageUrl" alt="@item.Name" class="img-fluid" />
+        <!-- Tab content -->
+        <div class="tab-content">
+            @for (int i = 0; i < Model.Count(); i++)
+            {
+                var cat = Model.ElementAt(i);
+                <div class="tab-pane fade @(i == 0 ? "show active" : "")" id="cat-@cat.CategoryId" role="tabpanel">
+                    <div class="row">
+                        @if (cat.MenuItems != null && cat.MenuItems.Any())
+                        {
+                            @foreach (var item in cat.MenuItems)
+                            {
+                                <div class="col-lg-3 col-md-4 col-sm-6 mb-4 d-flex align-items-stretch">
+                                    <div class="card w-100 shadow-sm text-center">
+                                        <div class="mt-3">
+                                            <img src="@item.ImageUrl"
+                                                 alt="@item.Name"
+                                                 class="rounded-circle mx-auto d-block"
+                                                 style="width: 120px; height: 120px; object-fit: cover; border: 2px solid #fff;" />
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">@item.Name</h5>
+                                            <p class="card-text">@item.Description</p>
+                                            <p class="text-danger fw-bold">@item.Price.ToString("C")</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-lg-6 details">
-                                    <h3>@item.Name</h3>
-                                    <p class="fst-italic text-muted">
-                                        @(string.IsNullOrEmpty(item.Description) ? "No description available." : item.Description)
-                                    </p>
-                                    <p><strong class="text-danger">@item.Price.ToString("C")</strong></p>
-                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-12">
+                                <p class="text-muted text-center">No items available in this category.</p>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     </div>
 </section>
+
 
             <!-- ======= Chefs Section ======= -->
 <section id="chefs" class="chefs section-bg">

@@ -2,73 +2,100 @@
 
 @{
     ViewData["Title"] = "Order Details";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
 }
 
-<h1>Order Details</h1>
+<section class="section-bg py-5">
+    <div class="container" data-aos="fade-up">
 
-<div class="mb-3">
-    <h4 class="text-primary">Order Information</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Order ID</dt>
-        <dd class="col-sm-10">@Model.OrderId</dd>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-danger mb-0">📄 Order Details #@Model.OrderId</h2>
+            <div>
+                <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">← Back to List</a>
+            </div>
+        </div>
 
-        <dt class="col-sm-2">Table</dt>
-        <dd class="col-sm-10">@Model.TableName</dd>
+        <div class="card shadow-sm p-4 rounded-4 mb-4">
+            <h5 class="text-primary fw-bold mb-3">📌 Order Information</h5>
+            <dl class="row mb-0">
+                <dt class="col-sm-3">🪑 Table</dt>
+                <dd class="col-sm-9">@Model.TableName</dd>
 
-        <dt class="col-sm-2">Staff</dt>
-        <dd class="col-sm-10">@Model.StaffName</dd>
+                <dt class="col-sm-3">👨‍🍳 Staff</dt>
+                <dd class="col-sm-9">@Model.StaffName</dd>
 
-        <dt class="col-sm-2">Time</dt>
-        <dd class="col-sm-10">@Model.OrderTime.ToString("dd/MM/yyyy HH:mm")</dd>
+                <dt class="col-sm-3">⏰ Time</dt>
+                <dd class="col-sm-9">@Model.OrderTime.ToString("dd/MM/yyyy HH:mm")</dd>
 
-        <dt class="col-sm-2">Total Amount</dt>
-        <dd class="col-sm-10"><strong>@Model.TotalAmount.ToString("N0") ₫</strong></dd>
+                <dt class="col-sm-3">📦 Status</dt>
+                <dd class="col-sm-9">@Model.Status</dd>
 
-        <dt class="col-sm-2">Status</dt>
-        <dd class="col-sm-10">@Model.Status</dd>
-    </dl>
-</div>
+                <dt class="col-sm-3">💵 Total</dt>
+                <dd class="col-sm-9 text-danger fw-bold">@Model.TotalAmount.ToString("N0") ₫</dd>
 
-<h4 class="text-primary">Ordered Dishes</h4>
-<table class="table table-bordered">
-    <thead class="table-light">
-        <tr>
-            <th>Dish Name</th>
-            <th>Quantity</th>
-            <th>Unit Price</th>
-            <th>Subtotal</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Items)
-        {
-            <tr>
-                <td>@item.MenuItemName</td>
-                <td>@item.Quantity</td>
-                <td>@item.UnitPrice.ToString("N0") ₫</td>
-                <td>@item.LineTotal.ToString("N0") ₫</td>
-            </tr>
-        }
-    </tbody>
-    <tfoot class="table-light">
-        <tr>
-            <td colspan="3" class="text-end"><strong>Total:</strong></td>
-            <td><strong>@Model.TotalAmount.ToString("N0") ₫</strong></td>
-        </tr>
-    </tfoot>
-</table>
+                <dt class="col-sm-3">💳 Payment</dt>
+                <dd class="col-sm-9">
+                    @switch (Model.PaymentStatus)
+                    {
+                        case AISDproject.Models.PaymentStatus.Paid:
+                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Paid</span>
+                            break;
+                        case AISDproject.Models.PaymentStatus.Pending:
+                            <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i> Unpaid</span>
+                            break;
+                        default:
+                            <span class="badge bg-secondary"><i class="bi bi-question-circle me-1"></i> Unknown</span>
+                            break;
+                    }
+                </dd>
+            </dl>
+        </div>
 
-<div class="mt-4">
-    <a asp-action="Edit" asp-route-id="@Model.OrderId" class="btn btn-warning">Edit</a>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        <div class="card shadow-sm p-4 rounded-4">
+            <h5 class="text-primary fw-bold mb-3">🍽️ Ordered Dishes</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr class="text-center">
+                            <th>Dish</th>
+                            <th>Qty</th>
+                            <th>Unit Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr class="text-center">
+                                <td>@item.MenuItemName</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.UnitPrice.ToString("N0") ₫</td>
+                                <td>@item.LineTotal.ToString("N0") ₫</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold">Total:</td>
+                            <td class="fw-bold text-danger">@Model.TotalAmount.ToString("N0") ₫</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
 
-    @if (Model.PaymentStatus != AISDproject.Models.PaymentStatus.Paid)
-    {
-        <a asp-action="Checkout" asp-route-id="@Model.OrderId" class="btn btn-success">Checkout</a>
-    }
-    else
-    {
-        <span class="badge bg-success">Paid</span>
-    }
-</div>
+        <div class="mt-4 text-end">
+            <a asp-action="Edit" asp-route-id="@Model.OrderId" class="btn btn-warning rounded-pill px-3 me-2">
+                <i class="bi bi-pencil-square me-1"></i> Edit
+            </a>
+
+            @if (Model.PaymentStatus != AISDproject.Models.PaymentStatus.Paid)
+            {
+                <a asp-action="Checkout" asp-route-id="@Model.OrderId" class="btn btn-success rounded-pill px-3">
+                    <i class="bi bi-credit-card me-1"></i> Checkout
+                </a>
+            }
+        </div>
+
+    </div>
+</section>

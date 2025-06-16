@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AISDproject.Data; // chứa RestaurantContext
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace AISDproject.Controllers
 {
@@ -13,10 +14,13 @@ namespace AISDproject.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var menuItems = _context.MenuItems.ToList(); // lấy tất cả món
-            return View(menuItems); // truyền vào View
+            var categories = await _context.Categories
+                .Include(c => c.MenuItems)
+                .ToListAsync();
+            return View(categories);
         }
+
     }
 }

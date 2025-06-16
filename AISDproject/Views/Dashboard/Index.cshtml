@@ -1,0 +1,40 @@
+﻿@model AISDproject.ViewModels.DashboardViewModel
+
+@{
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<section class="container py-4">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-danger">Admin Dashboard</h2>
+        <p class="text-muted">Overview of today’s performance</p>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card bg-light border-start border-4 border-primary shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-primary">Total Orders Today</h6>
+                    <p class="card-text display-6 fw-bold text-dark">@Model.TotalOrdersToday</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light border-start border-4 border-success shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-success">Revenue Today</h6>
+                    <p class="card-text display-6 fw-bold text-dark">$@Model.RevenueToday.ToString("N0")</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light border-start border-4 border-warning shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-warning">Active Reservations</h6>
+                    <p class="card-text display-6 fw-bold text-dark">@Model.ActiveReservations</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Orders";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
 }
 
 <section class="section-bg py-5">
@@ -19,7 +19,7 @@
             <div class="card-body p-4">
                 <div class="table-responsive">
                     <table class="table table-hover table-striped align-middle mb-0">
-                        <thead class="table-danger text-center">
+                        <thead class="table-danger text-center rounded-top">
                             <tr>
                                 <th>Order ID</th>
                                 <th>Table</th>
@@ -28,13 +28,13 @@
                                 <th>Total</th>
                                 <th>Status</th>
                                 <th>Payment</th>
-                                <th style="width: 160px;">Actions</th>
+                                <th style="width: 180px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var order in Model)
                             {
-                                <tr class="text-center @(order.PaymentStatus == AISDproject.Models.PaymentStatus.Paid ? "" : "table-warning")">
+                                <tr class="text-center align-middle table-row-hover @(order.PaymentStatus == AISDproject.Models.PaymentStatus.Paid ? "" : "table-warning")">
                                     <td>@order.OrderId</td>
                                     <td>@order.TableName</td>
                                     <td>@order.StaffName</td>
@@ -45,30 +45,40 @@
                                         @switch (order.PaymentStatus)
                                         {
                                             case AISDproject.Models.PaymentStatus.Paid:
-                                                <span class="badge bg-success">Paid</span>
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-check-circle me-1"></i> Paid
+                                                </span>
                                                 break;
                                             case AISDproject.Models.PaymentStatus.Pending:
-                                                <span class="badge bg-danger">Unpaid</span>
+                                                <span class="badge bg-danger">
+                                                    <i class="bi bi-exclamation-circle me-1"></i> Unpaid
+                                                </span>
                                                 break;
                                             default:
-                                                <span class="badge bg-secondary">Unknown</span>
+                                                <span class="badge bg-secondary">
+                                                    <i class="bi bi-question-circle me-1"></i> Unknown
+                                                </span>
                                                 break;
                                         }
                                     </td>
                                     <td>
                                         <div class="d-flex justify-content-center gap-1">
-                                            <a asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-secondary rounded-pill">
+                                            <a asp-action="Details" asp-route-id="@order.OrderId"
+                                               class="btn btn-sm btn-outline-secondary rounded-pill" title="View Details">
                                                 <i class="bi bi-info-circle"></i>
                                             </a>
-                                            <a asp-action="Edit" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-primary rounded-pill">
+                                            <a asp-action="Edit" asp-route-id="@order.OrderId"
+                                               class="btn btn-sm btn-outline-primary rounded-pill" title="Edit Order">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
-                                            <a asp-action="Delete" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-danger rounded-pill">
+                                            <a asp-action="Delete" asp-route-id="@order.OrderId"
+                                               class="btn btn-sm btn-outline-danger rounded-pill" title="Delete Order">
                                                 <i class="bi bi-trash"></i>
                                             </a>
                                             @if (order.PaymentStatus == AISDproject.Models.PaymentStatus.Pending)
                                             {
-                                                <a asp-action="Checkout" asp-route-id="@order.OrderId" class="btn btn-sm btn-success rounded-pill">
+                                                <a asp-action="Checkout" asp-route-id="@order.OrderId"
+                                                   class="btn btn-sm btn-success rounded-pill" title="Checkout & Pay">
                                                     <i class="bi bi-credit-card"></i>
                                                 </a>
                                             }
@@ -84,3 +94,10 @@
 
     </div>
 </section>
+
+<style>
+    .table-row-hover:hover {
+        background-color: #fff3cd !important;
+        transition: background-color 0.3s ease;
+    }
+</style>

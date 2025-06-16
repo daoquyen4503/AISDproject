@@ -37,9 +37,19 @@ namespace AISDproject.Controllers
 
             if (staff != null)
             {
+                // Save login info to session
                 HttpContext.Session.SetString("Username", staff.Username);
                 HttpContext.Session.SetString("Role", staff.Role);
-                return RedirectToAction("Index", "Home");
+
+                // Redirect by role
+                return staff.Role switch
+                {
+                    "Admin" => RedirectToAction("Index", "Dashboard"),
+                    "Manager" => RedirectToAction("Index", "Dashboard"),
+                    "Waiter" => RedirectToAction("Index", "Orders"),
+                    "Cashier" => RedirectToAction("Index", "Payment"),
+                    _ => RedirectToAction("Index", "Home")
+                };
             }
 
             ModelState.AddModelError(string.Empty, "Invalid username or password");
