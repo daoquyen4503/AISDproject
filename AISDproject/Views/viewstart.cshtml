@@ -1,0 +1,22 @@
+﻿@{
+    var user = Context.User;
+
+    if (user.Identity != null && user.Identity.IsAuthenticated)
+    {
+        // Nếu là nhân viên, dùng layout dành cho staff
+        if (user.IsInRole("Staff") || user.IsInRole("Waiter") || user.IsInRole("Cashier") || user.IsInRole("Manager") || user.IsInRole("Admin"))
+        {
+            Layout = "~/Views/Shared/_StaffLayout.cshtml";
+        }
+        else
+        {
+            // Người dùng đăng nhập nhưng không phải staff
+            Layout = "~/Views/Shared/_Layout.cshtml";
+        }
+    }
+    else
+    {
+        // Khách chưa đăng nhập (guest) → dùng layout mặc định
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+}

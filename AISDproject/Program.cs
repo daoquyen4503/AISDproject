@@ -1,13 +1,14 @@
 ﻿using AISDproject.Data;
-using AISDproject.Repositeries.Implementation;
 using AISDproject.Repositeries;
-using AISDproject.Services.Implementation;
+using AISDproject.Repositeries.Implementation;
 using AISDproject.Services;
+using AISDproject.Services.Implementation;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Đăng ký DI cho Repository & Service
 builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
 builder.Services.AddScoped<IMenuItemService, MenuItemService>();
 
@@ -23,28 +24,35 @@ builder.Services.AddScoped<IStaffService, StaffService>();
 builder.Services.AddScoped<ITableRepository, TableRepository>();
 builder.Services.AddScoped<ITableService, TableService>();
 
-// them vao de chay timeslot
 builder.Services.AddScoped<ITimeSlotService, TimeSlotService>();
 
-
-// Đăng ký DbContext ở đây
+// Đăng ký DbContext
 builder.Services.AddDbContext<RestaurantContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Đăng ký MVC
 builder.Services.AddControllersWithViews();
 
-// 👇 Thêm phần cấu hình session này
+// Cấu hình Session
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian timeout
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
+// Cấu hình Cookie Authentication
+builder.Services.AddAuthentication("MyCookieAuth")
+    .AddCookie("MyCookieAuth", options =>
+    {
+        options.Cookie.Name = "MyCookieAuth";
+        options.LoginPath = "/Login/Index";
+        options.AccessDeniedPath = "/Home/AccessDenied"; // tùy chọn nếu bạn muốn
+    });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Middleware pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -56,21 +64,14 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession(); // 👈 dòng này cực quan trọng
+// Bắt buộc theo thứ tự này
+app.UseSession();
+app.UseAuthentication();
+app.UseAuthorization();
 
-app.Use(async (context, next) =>
-{
-    Console.WriteLine($"Requested Path: {context.Request.Path}");
-    await next();
-});
-
-
-app.UseAuthorization();         // ← nếu có phân quyền
-
+// Điều hướng mặc định
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-
 app.Run();
-
