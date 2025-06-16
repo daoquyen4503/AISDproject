@@ -3,9 +3,11 @@ using AISDproject.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using System.Threading.Tasks;
+using AISDproject.Filters; // Thêm namespace cho filter
 
 namespace AISDproject.Controllers
 {
+    [AuthorizeRole("Admin", "Manager")]
     public class MenuItemsController : Controller
     {
         private readonly IMenuItemService _service;

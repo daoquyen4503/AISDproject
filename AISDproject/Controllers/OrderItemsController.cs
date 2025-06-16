@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AISDproject.Data;
 using AISDproject.Models;
+using AISDproject.Filters; // ✅ Bổ sung
 
 namespace AISDproject.Controllers
 {
+    [AuthorizeRole("Waiter", "Cashier")] // ✅ Chỉ waiter có toàn quyền
     [Route("OrderItems")]
     public class OrderItemsController : Controller
     {

@@ -26,6 +26,14 @@ namespace AISDproject.Models
 
         public bool Status { get; set; } = true; // true = Đang bán, false = Ngừng bán
 
+        [Required(ErrorMessage = "Danh mục là bắt buộc")]
+        public int CategoryId { get; set; }
+
+        [ForeignKey("CategoryId")]
+        [ValidateNever]
+        public Category Category { get; set; }
+
+
         [ValidateNever]
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }

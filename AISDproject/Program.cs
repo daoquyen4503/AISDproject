@@ -33,6 +33,15 @@ builder.Services.AddDbContext<RestaurantContext>(options =>
 
 builder.Services.AddControllersWithViews();
 
+// 👇 Thêm phần cấu hình session này
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian timeout
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -46,6 +55,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseSession(); // 👈 dòng này cực quan trọng
+
 app.Use(async (context, next) =>
 {
     Console.WriteLine($"Requested Path: {context.Request.Path}");
