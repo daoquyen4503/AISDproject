@@ -1,82 +1,75 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
-using AISDproject.Models;
+﻿using AISDproject.Data;
+using AISDproject.Repositeries.Implementation;
+using AISDproject.Repositeries;
+using AISDproject.Services.Implementation;
 using AISDproject.Services;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
+using Microsoft.EntityFrameworkCore;
 
-namespace AISDproject.Controllers
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
+builder.Services.AddScoped<IMenuItemService, MenuItemService>();
+
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+
+builder.Services.AddScoped<IStaffRepository, StaffRepository>();
+builder.Services.AddScoped<IStaffService, StaffService>();
+
+builder.Services.AddScoped<ITableRepository, TableRepository>();
+builder.Services.AddScoped<ITableService, TableService>();
+
+// them vao de chay timeslot
+builder.Services.AddScoped<ITimeSlotService, TimeSlotService>();
+
+
+// Đăng ký DbContext ở đây
+builder.Services.AddDbContext<RestaurantContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddControllersWithViews();
+
+// 👇 Thêm phần cấu hình session này
+builder.Services.AddSession(options =>
 {
-    public class LoginController : Controller
-    {
-        private readonly IStaffService _staffService;
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian timeout
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
-        public LoginController(IStaffService staffService)
-        {
-            _staffService = staffService;
-        }
 
-        [HttpGet]
-        public IActionResult Index()
-        {
-            return View();
-        }
+var app = builder.Build();
 
-        [HttpPost]
-        public async Task<IActionResult> Index(LoginViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            // Hash password để so khớp
-            using var sha256 = SHA256.Create();
-            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(model.Password));
-            var hashedPassword = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
-
-            var staff = (await _staffService.GetAllStaffAsync())
-                        .FirstOrDefault(s => s.Username == model.Username && s.PasswordHash == hashedPassword);
-
-            if (staff != null)
-            {
-                // Tạo Claims
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, staff.Username),
-                    new Claim(ClaimTypes.Role, staff.Role)
-                };
-
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var principal = new ClaimsPrincipal(identity);
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
-                // Redirect theo vai trò
-                switch (staff.Role)
-                {
-                    case "Admin":
-                    case "Manager":
-                        return RedirectToAction("Index", "Dashboard");
-
-                    case "Waiter":
-                    case "Cashier":
-                        return RedirectToAction("Index", "Orders");
-
-                    default:
-                        return RedirectToAction("Index", "Home");
-                }
-            }
-
-            ModelState.AddModelError(string.Empty, "Invalid username or password");
-            return View(model);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Logout()
-        {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Index", "Home");
-        }
-    }
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseSession(); // 👈 dòng này cực quan trọng
+
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"Requested Path: {context.Request.Path}");
+    await next();
+});
+
+
+app.UseAuthorization();         // ← nếu có phân quyền
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+app.Run();
