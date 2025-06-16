@@ -137,3 +137,105 @@
         });
     </script>
 }
+
+@* //Tham khảo đoạn sau  *@
+@* @model AISDproject.ViewModels.OrderCreateViewModel *@
+
+@* @{ *@
+@*     ViewData["Title"] = "Create Order"; *@
+@*     var menuPricesJson = System.Text.Json.JsonSerializer.Serialize( *@
+@*         Model.MenuItems.ToDictionary(m => m.MenuItemId, m => m.Price) *@
+@*     ); *@
+@* } *@
+
+@* <section class="section-bg py-5"> *@
+@*     <div class="container" data-aos="fade-up"> *@
+@*         <div class="text-center mb-4"> *@
+@*             <h2 class="fw-bold text-danger">🧾 Create New Order</h2> *@
+@*         </div> *@
+
+@*         <form asp-controller="Orders" asp-action="Create" method="post"> *@
+@*             @Html.AntiForgeryToken() *@
+
+@*             <div class="row mb-4"> *@
+@*                 <div class="col-md-6"> *@
+@*                     <label asp-for="TableId" class="form-label fw-semibold">Table</label> *@
+@*                     <select asp-for="TableId" class="form-select rounded-pill" asp-items="Model.TableList"> *@
+@*                         <option value="">-- Select Table --</option> *@
+@*                     </select> *@
+@*                     <span asp-validation-for="TableId" class="text-danger"></span> *@
+@*                 </div> *@
+@*                 <div class="col-md-6"> *@
+@*                     <label asp-for="StaffId" class="form-label fw-semibold">Staff</label> *@
+@*                     <select asp-for="StaffId" class="form-select rounded-pill" asp-items="Model.StaffList"> *@
+@*                         <option value="">-- Select Staff --</option> *@
+@*                     </select> *@
+@*                     <span asp-validation-for="StaffId" class="text-danger"></span> *@
+@*                 </div> *@
+@*             </div> *@
+
+@*             <div class="row g-4"> *@
+@*                 @foreach (var item in Model.MenuItems) *@
+@*                 { *@
+@*                     <div class="col-md-4"> *@
+@*                         <div class="card h-100 shadow-sm rounded-4 text-center p-3"> *@
+@*                             <img src="@item.ImageUrl" class="card-img-top rounded mb-2" style="height: 180px; object-fit: cover;" alt="@item.Name" /> *@
+@*                             <div class="card-body"> *@
+@*                                 <h5 class="card-title">@item.Name</h5> *@
+@*                                 <p class="text-muted">@item.Price.ToString("N0") đ</p> *@
+
+@*                                 <div class="input-group justify-content-center mb-2"> *@
+@*                                     <button type="button" class="btn btn-outline-danger" onclick="changeQuantity(@item.MenuItemId, -1)">-</button> *@
+@*                                     <input type="number" *@
+@*                                            name="Quantities[@item.MenuItemId]" *@
+@*                                            id="qty-@item.MenuItemId" *@
+@*                                            value="0" *@
+@*                                            class="form-control text-center mx-1" *@
+@*                                            style="width: 60px;" readonly /> *@
+@*                                     <button type="button" class="btn btn-outline-success" onclick="changeQuantity(@item.MenuItemId, 1)">+</button> *@
+@*                                 </div> *@
+@*                             </div> *@
+@*                         </div> *@
+@*                     </div> *@
+@*                 } *@
+@*             </div> *@
+
+@*             <div class="text-end mt-4"> *@
+@*                 <h5>Total: <span id="total-amount" class="text-success fw-bold">0</span> ₫</h5> *@
+@*             </div> *@
+
+@*             <div class="mt-4 text-end"> *@
+@*                 <button type="submit" class="btn btn-danger rounded-pill px-5 py-2"> *@
+@*                     <i class="bi bi-cart-check"></i> Submit Order *@
+@*                 </button> *@
+@*             </div> *@
+@*         </form> *@
+@*     </div> *@
+@* </section> *@
+
+@* @section Scripts { *@
+@*     <script> *@
+@*         const prices = @Html.Raw(menuPricesJson); *@
+
+@*         function changeQuantity(id, delta) { *@
+@*             const input = document.getElementById('qty-' + id); *@
+@*             let value = parseInt(input.value); *@
+@*             if (isNaN(value)) value = 0; *@
+@*             value = Math.max(0, value + delta); *@
+@*             input.value = value; *@
+@*             updateTotal(); *@
+@*         } *@
+
+@*         function updateTotal() { *@
+@*             let total = 0; *@
+@*             for (const id in prices) { *@
+@*                 const qtyInput = document.getElementById('qty-' + id); *@
+@*                 const qty = parseInt(qtyInput?.value || 0); *@
+@*                 total += prices[id] * qty; *@
+@*             } *@
+@*             document.getElementById('total-amount').textContent = total.toLocaleString(); *@
+@*         } *@
+
+@*         document.addEventListener('DOMContentLoaded', updateTotal); *@
+@*     </script> *@
+@* } *@

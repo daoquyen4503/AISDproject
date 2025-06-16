@@ -1,37 +1,43 @@
-﻿<h1>Chi tiết đơn hàng</h1>
+﻿@model AISDproject.ViewModels.OrderDetailViewModel
+
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<h1>Order Details</h1>
 
 <div class="mb-3">
-    <h4 class="text-primary">Thông tin đơn hàng</h4>
+    <h4 class="text-primary">Order Information</h4>
     <hr />
     <dl class="row">
-        <dt class="col-sm-2">Mã đơn</dt>
+        <dt class="col-sm-2">Order ID</dt>
         <dd class="col-sm-10">@Model.OrderId</dd>
 
-        <dt class="col-sm-2">Bàn</dt>
+        <dt class="col-sm-2">Table</dt>
         <dd class="col-sm-10">@Model.TableName</dd>
 
-        <dt class="col-sm-2">Nhân viên</dt>
+        <dt class="col-sm-2">Staff</dt>
         <dd class="col-sm-10">@Model.StaffName</dd>
 
-        <dt class="col-sm-2">Thời gian</dt>
+        <dt class="col-sm-2">Time</dt>
         <dd class="col-sm-10">@Model.OrderTime.ToString("dd/MM/yyyy HH:mm")</dd>
 
-        <dt class="col-sm-2">Tổng tiền</dt>
-        <dd class="col-sm-10"><strong>@Model.TotalAmount.ToString("N0") đ</strong></dd>
+        <dt class="col-sm-2">Total Amount</dt>
+        <dd class="col-sm-10"><strong>@Model.TotalAmount.ToString("N0") ₫</strong></dd>
 
-        <dt class="col-sm-2">Trạng thái</dt>
+        <dt class="col-sm-2">Status</dt>
         <dd class="col-sm-10">@Model.Status</dd>
     </dl>
 </div>
 
-<h4 class="text-primary">Chi tiết món ăn</h4>
+<h4 class="text-primary">Ordered Dishes</h4>
 <table class="table table-bordered">
     <thead class="table-light">
         <tr>
-            <th>Tên món</th>
-            <th>Số lượng</th>
-            <th>Đơn giá</th>
-            <th>Thành tiền</th>
+            <th>Dish Name</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Subtotal</th>
         </tr>
     </thead>
     <tbody>
@@ -40,29 +46,29 @@
             <tr>
                 <td>@item.MenuItemName</td>
                 <td>@item.Quantity</td>
-                <td>@item.UnitPrice.ToString("N0") đ</td>
-                <td>@item.LineTotal.ToString("N0") đ</td>
+                <td>@item.UnitPrice.ToString("N0") ₫</td>
+                <td>@item.LineTotal.ToString("N0") ₫</td>
             </tr>
         }
     </tbody>
     <tfoot class="table-light">
         <tr>
-            <td colspan="3" class="text-end"><strong>Tổng cộng:</strong></td>
-            <td><strong>@Model.TotalAmount.ToString("N0") đ</strong></td>
+            <td colspan="3" class="text-end"><strong>Total:</strong></td>
+            <td><strong>@Model.TotalAmount.ToString("N0") ₫</strong></td>
         </tr>
     </tfoot>
 </table>
 
 <div class="mt-4">
-    <a asp-action="Edit" asp-route-id="@Model.OrderId" class="btn btn-warning">Chỉnh sửa</a>
-    <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+    <a asp-action="Edit" asp-route-id="@Model.OrderId" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 
     @if (Model.PaymentStatus != AISDproject.Models.PaymentStatus.Paid)
     {
-        <a asp-action="Checkout" asp-route-id="@Model.OrderId" class="btn btn-success">Thanh toán</a>
+        <a asp-action="Checkout" asp-route-id="@Model.OrderId" class="btn btn-success">Checkout</a>
     }
     else
     {
-        <span class="badge bg-success">Đã thanh toán</span>
+        <span class="badge bg-success">Paid</span>
     }
 </div>

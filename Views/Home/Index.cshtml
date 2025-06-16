@@ -1,0 +1,175 @@
+﻿@model IEnumerable<AISDproject.Models.MenuItem>
+
+@{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- ======= Hero Section ======= -->
+<section id="hero" class="d-flex align-items-center">
+    <div class="container position-relative text-center text-lg-start" data-aos="zoom-in" data-aos-delay="100">
+        <div class="row">
+            <div class="col-lg-6 d-flex flex-column justify-content-center">
+                <h1>Enjoy Your <span>Healthy</span> Delicious Food</h1>
+                <h2>We are team of talented chefs bringing great food to your table</h2>
+                <div class="d-flex mt-4">
+                    <a asp-controller="Reservations" asp-action="Create" class="btn-book animate__animated animate__fadeInUp scrollto">Book a Table</a>
+                    <a href="https://www.youtube.com/" class="glightbox btn-watch-video d-flex align-items-center">
+                        <i class="bi bi-play-circle"></i><span>Watch Video</span>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 hero-img">
+                <img src="~/assets/img/menu/menu-item-1.png" class="img-fluid animated" alt="Hero Image">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ======= About Section ======= -->
+<section id="about" class="about">
+    <div class="container" data-aos="fade-up">
+        <div class="row">
+            <div class="col-lg-6 order-1 order-lg-2" data-aos="zoom-in" data-aos-delay="100">
+                <div class="about-img">
+                    <img src="~/assets/img/about.jpg" class="img-fluid" alt="About us">
+                </div>
+            </div>
+            <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1 content">
+                <h3>Learn More <span>About Us</span></h3>
+                <p class="fst-italic">
+                    We are passionate about delivering delicious, healthy, and unforgettable meals to our guests.
+                </p>
+                <ul>
+                    <li><i class="bi bi-check-circle"></i> Fresh ingredients sourced locally every day.</li>
+                    <li><i class="bi bi-check-circle"></i> Dishes inspired by tradition, crafted with creativity.</li>
+                    <li><i class="bi bi-check-circle"></i> Cozy dining experience in the heart of the city.</li>
+                </ul>
+                <p>
+                    Whether you're dining in or ordering for takeout, AISD Restaurant is dedicated to ensuring that every dish is prepared with care and attention to detail.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ======= Specials Section (Dynamic from MenuItems) ======= -->
+<section id="specials" class="specials">
+    <div class="container" data-aos="fade-up">
+        <div class="section-title">
+            <h2>Menu</h2>
+            <p>Explore Our Dishes</p>
+        </div>
+
+        <div class="row">
+            <!-- Tab list -->
+            <div class="col-lg-4">
+                <ul class="nav nav-tabs flex-column">
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        var item = Model.ElementAt(i);
+                        <li class="nav-item">
+                            <a class="nav-link @(i == 0 ? "active show" : "")" data-bs-toggle="tab" href="#tab-@i">
+                                @item.Name
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <!-- Tab content -->
+            <div class="col-lg-8 mt-4 mt-lg-0">
+                <div class="tab-content">
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        var item = Model.ElementAt(i);
+                        <div class="tab-pane @(i == 0 ? "active show" : "")" id="tab-@i">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <img src="@item.ImageUrl" alt="@item.Name" class="img-fluid" />
+                                </div>
+                                <div class="col-lg-6 details">
+                                    <h3>@item.Name</h3>
+                                    <p class="fst-italic text-muted">
+                                        @(string.IsNullOrEmpty(item.Description) ? "No description available." : item.Description)
+                                    </p>
+                                    <p><strong class="text-danger">@item.Price.ToString("C")</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+            <!-- ======= Chefs Section ======= -->
+<section id="chefs" class="chefs section-bg">
+                <div class="container" data-aos="fade-up">
+
+                    <div class="section-title">
+                        <h2>Chefs</h2>
+                        <p>Our Professional Chefs</p>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
+                            <div class="chef-member" data-aos="zoom-in" data-aos-delay="100">
+                                <a href="https://en.wikipedia.org/wiki/Walter_White_(Breaking_Bad)" target="_blank">
+                                    <img src="~/assets/img/chefs/chefs-1.jpg" class="img-fluid" alt="Chef Walter White">
+                                </a>
+                                <div class="member-content">
+                                    <h4>
+                                        <a href="https://en.wikipedia.org/wiki/Walter_White_(Breaking_Bad)" target="_blank">Walter White</a>
+                                    </h4>
+                                    <span>Master Chef</span>
+                                    <p>
+                                        Walter brings over 20 years of culinary excellence to our kitchen, crafting each dish with precision and passion.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
+                            <div class="chef-member" data-aos="zoom-in" data-aos-delay="200">
+                                <a href="https://vi.wikipedia.org/wiki/Gordon_Ramsay" target="_blank">
+                                    <img src="~/assets/img/chefs/chefs-4.jpg" class="img-fluid" alt="Chef Gordon Ramsay">
+                                </a>
+                                <div class="member-content">
+                                    <h4>
+                                        <a href="https://en.wikipedia.org/wiki/Sarah_(given_name)" target="_blank">Gordon Ramsay</a>
+                                    </h4>
+                                    <span>Passier</span>
+                                    <p>
+                                        Known for her exquisite desserts and pastries, Sarah adds sweetness and creativity to every plate.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
+                            <div class="chef-member" data-aos="zoom-in" data-aos-delay="300">
+                                <a href="https://en.wikipedia.org/wiki/William_Anderson_(naval_officer)" target="_blank">
+                                    <img src="~/assets/img/chefs/chefs-3.jpg" class="img-fluid" alt="Chef William Anderson">
+                                </a>
+                                <div class="member-content">
+                                    <h4>
+                                        <a href="https://en.wikipedia.org/wiki/William_Anderson_(naval_officer)" target="_blank">William Anderson</a>
+                                    </h4>
+                                    <span>Cook</span>
+                                    <p>
+                                        William specializes in grilled and savory dishes, delivering bold flavors that keep guests coming back.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+        </div>
+    </div>
+</section>

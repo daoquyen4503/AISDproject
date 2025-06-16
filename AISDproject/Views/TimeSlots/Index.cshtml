@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<AISDproject.Models.TimeSlot>
+
 @{
     ViewData["Title"] = "Time Slots";
 }
@@ -38,8 +39,12 @@
                                 foreach (var item in Model)
                                 {
                                     <tr>
-                                        <td class="text-center">@item.StartTime.ToString("HH\\:mm")</td>
-                                        <td class="text-center">@item.EndTime.ToString("HH\\:mm")</td>
+                                        <td class="text-center">
+                                            @(item.StartTime != default ? item.StartTime.ToString("hh\\:mm") : "-")
+                                        </td>
+                                        <td class="text-center">
+                                            @(item.EndTime != default ? item.EndTime.ToString("hh\\:mm") : "-")
+                                        </td>
                                         <td class="text-center">
                                             <div class="d-flex justify-content-center gap-2">
                                                 <a asp-action="Edit" asp-route-id="@item.TimeSlotId" class="btn btn-sm btn-outline-primary rounded-circle" title="Edit">
