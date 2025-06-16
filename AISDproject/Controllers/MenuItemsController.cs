@@ -7,7 +7,7 @@ using AISDproject.Filters; // Thêm namespace cho filter
 
 namespace AISDproject.Controllers
 {
-    [AuthorizeRole("Admin", "Manager")]
+    //[AuthorizeRole("Admin", "Manager")]
     public class MenuItemsController : Controller
     {
         private readonly IMenuItemService _service;

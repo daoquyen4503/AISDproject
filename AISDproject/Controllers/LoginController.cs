@@ -1,75 +1,52 @@
-﻿using AISDproject.Data;
-using AISDproject.Repositeries.Implementation;
-using AISDproject.Repositeries;
-using AISDproject.Services.Implementation;
+﻿using AISDproject.Models;
 using AISDproject.Services;
-using Microsoft.EntityFrameworkCore;
+using System.Text;
+using Microsoft.AspNetCore.Mvc;
+using AISDproject.Models;
+using System.Security.Cryptography;
+using System.Text;
+using AISDproject.Services;
 
-
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
-builder.Services.AddScoped<IMenuItemService, MenuItemService>();
-
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IOrderService, OrderService>();
-
-builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
-builder.Services.AddScoped<IReservationService, ReservationService>();
-
-builder.Services.AddScoped<IStaffRepository, StaffRepository>();
-builder.Services.AddScoped<IStaffService, StaffService>();
-
-builder.Services.AddScoped<ITableRepository, TableRepository>();
-builder.Services.AddScoped<ITableService, TableService>();
-
-// them vao de chay timeslot
-builder.Services.AddScoped<ITimeSlotService, TimeSlotService>();
-
-
-// Đăng ký DbContext ở đây
-builder.Services.AddDbContext<RestaurantContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddControllersWithViews();
-
-// 👇 Thêm phần cấu hình session này
-builder.Services.AddSession(options =>
+namespace AISDproject.ControllersAdd
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian timeout
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
-
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+    public class LoginController : Controller
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    private readonly IStaffService _staffService;
+
+    public LoginController(IStaffService staffService)
+    {
+        _staffService = staffService;
+    }
+
+    [HttpGet]
+    public IActionResult Index()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Index(LoginViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        // Hash password
+        using var sha256 = SHA256.Create();
+        var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(model.Password));
+        var hashedPassword = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+
+        var staff = (await _staffService.GetAllStaffAsync())
+                    .FirstOrDefault(s => s.Username == model.Username && s.PasswordHash == hashedPassword);
+
+        if (staff != null)
+        {
+            HttpContext.Session.SetString("Username", staff.Username);
+            HttpContext.Session.SetString("Role", staff.Role);
+            return RedirectToAction("Index", "Home");
+        }
+
+        ModelState.AddModelError(string.Empty, "Invalid username or password");
+        return View(model);
+    }
 }
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseSession(); // 👈 dòng này cực quan trọng
-
-app.Use(async (context, next) =>
-{
-    Console.WriteLine($"Requested Path: {context.Request.Path}");
-    await next();
-});
-
-
-app.UseAuthorization();         // ← nếu có phân quyền
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-
-app.Run();
+}
