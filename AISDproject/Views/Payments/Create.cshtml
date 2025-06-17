@@ -1,45 +1,70 @@
 ﻿@model AISDproject.Models.Payment
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Payment";
     Layout = "~/Views/Shared/_StaffLayout.cshtml";
 }
 
-<h1>Create</h1>
+<section class="section-bg py-5">
+    <div class="container" data-aos="fade-up">
+        <div class="card border-0 shadow rounded-4">
+            <div class="card-body p-5">
+                <h2 class="fw-bold text-danger mb-4">
+                    <i class="bi bi-credit-card me-2"></i> Create Payment
+                </h2>
 
-<h4>Payment</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="PaymentDate" class="control-label"></label>
-                <input asp-for="PaymentDate" class="form-control" />
-                <span asp-validation-for="PaymentDate" class="text-danger"></span>
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <!-- Payment Date -->
+                    <div class="form-group mb-3">
+                        <label asp-for="PaymentDate" class="form-label fw-semibold">Payment Date</label>
+                        <input asp-for="PaymentDate" class="form-control rounded-pill" />
+                        <span asp-validation-for="PaymentDate" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Amount -->
+                    <div class="form-group mb-3">
+                        <label asp-for="Amount" class="form-label fw-semibold">Amount</label>
+                        <input asp-for="Amount" class="form-control rounded-pill" />
+                        <span asp-validation-for="Amount" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="form-group mb-3">
+                        <label asp-for="PaymentMethod" class="form-label fw-semibold">Payment Method</label>
+                        <select asp-for="PaymentMethod" class="form-select rounded-pill">
+                            <option value="">-- Select Method --</option>
+                            @foreach (var method in Enum.GetValues(typeof(AISDproject.Models.PaymentMethod)))
+                            {
+                                <option value="@method">@method</option>
+                            }
+                        </select>
+                        <span asp-validation-for="PaymentMethod" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Order -->
+                    <div class="form-group mb-4">
+                        <label asp-for="OrderId" class="form-label fw-semibold">Order</label>
+                        <select asp-for="OrderId" class="form-select rounded-pill" asp-items="ViewBag.OrderId">
+                            <option value="">-- Select Order --</option>
+                        </select>
+                        <span asp-validation-for="OrderId" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">← Back to List</a>
+                        <button type="submit" class="btn btn-danger rounded-pill px-4">
+                            <i class="bi bi-check-circle me-1"></i> Confirm
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="Amount" class="control-label"></label>
-                <input asp-for="Amount" class="form-control" />
-                <span asp-validation-for="Amount" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PaymentMethod" class="control-label"></label>
-                <input asp-for="PaymentMethod" class="form-control" />
-                <span asp-validation-for="PaymentMethod" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="OrderId" class="control-label"></label>
-                <select asp-for="OrderId" class ="form-control" asp-items="ViewBag.OrderId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
+</section>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

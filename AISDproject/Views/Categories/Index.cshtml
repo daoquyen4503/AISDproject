@@ -31,10 +31,27 @@
                                     <td>@item.Name</td>
                                     <td>@item.Description</td>
                                     <td class="text-center">
-                                        <a asp-action="Details" asp-route-id="@item.CategoryId" class="btn btn-sm btn-outline-secondary rounded-pill me-1">Details</a>
-                                        <a asp-action="Edit" asp-route-id="@item.CategoryId" class="btn btn-sm btn-outline-primary rounded-pill me-1">Edit</a>
-                                        <a asp-action="Delete" asp-route-id="@item.CategoryId" class="btn btn-sm btn-outline-danger rounded-pill">Delete</a>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <a asp-action="Details" asp-route-id="@item.CategoryId"
+                                               class="btn btn-outline-secondary btn-sm rounded-pill px-3"
+                                               data-bs-toggle="tooltip" title="View details">
+                                                View
+                                            </a>
+
+                                            <a asp-action="Edit" asp-route-id="@item.CategoryId"
+                                               class="btn btn-outline-primary btn-sm rounded-pill px-3"
+                                               data-bs-toggle="tooltip" title="Edit category">
+                                                Edit
+                                            </a>
+
+                                            <a asp-action="Delete" asp-route-id="@item.CategoryId"
+                                               class="btn btn-outline-danger btn-sm rounded-pill px-3"
+                                               data-bs-toggle="tooltip" title="Delete category">
+                                                Delete
+                                            </a>
+                                        </div>
                                     </td>
+
                                 </tr>
                             }
                         </tbody>

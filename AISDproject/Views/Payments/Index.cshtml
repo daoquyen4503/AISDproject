@@ -1,54 +1,62 @@
 ﻿@model IEnumerable<AISDproject.Models.Payment>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Payments";
     Layout = "~/Views/Shared/_StaffLayout.cshtml";
 }
 
-<h1>Index</h1>
+<section class="section-bg py-5">
+    <div class="container" data-aos="fade-up">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.PaymentDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Amount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PaymentMethod)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Order)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.PaymentDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Amount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PaymentMethod)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Order.OrderId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.PaymentId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.PaymentId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.PaymentId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-danger mb-0">Manage Payments</h2>
+            <a asp-action="Create" class="btn btn-danger rounded-pill shadow px-4 py-2">
+                Create New Payment
+            </a>
+        </div>
+
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle mb-0">
+                        <thead class="table-danger text-center rounded-top">
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Order</th>
+                                <th style="width: 180px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr class="text-center align-middle table-row-hover">
+                                    <td>@item.PaymentDate.ToString("g")</td>
+                                    <td>@item.Amount.ToString("N0") đ</td>
+                                    <td>@item.PaymentMethod</td>
+                                    <td>@item.Order?.OrderId</td>
+                                    <td>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <a asp-action="Details" asp-route-id="@item.PaymentId" class="btn btn-sm btn-outline-secondary rounded-pill">Details</a>
+                                            <a asp-action="Edit" asp-route-id="@item.PaymentId" class="btn btn-sm btn-outline-primary rounded-pill">Edit</a>
+                                            <a asp-action="Delete" asp-route-id="@item.PaymentId" class="btn btn-sm btn-outline-danger rounded-pill">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<style>
+    .table-row-hover:hover {
+        background-color: #fff3cd !important;
+        transition: background-color 0.3s ease;
+    }
+</style>

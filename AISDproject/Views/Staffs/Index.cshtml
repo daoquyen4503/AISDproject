@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "Manage Staff";
     Layout = "~/Views/Shared/_StaffLayout.cshtml";
-
 }
 
 <style>
@@ -35,6 +34,11 @@
 
     .table th, .table td {
         vertical-align: middle !important;
+    }
+
+    .table tbody tr:hover {
+        background-color: #fff3cd !important;
+        transition: background-color 0.3s ease;
     }
 </style>
 
@@ -77,16 +81,22 @@
                                         <td class="text-center">@item.FullName</td>
                                         <td class="text-center">@item.Role</td>
                                         <td class="text-center">@item.Username</td>
-                                        <td class="text-center">@item.PasswordHash</td>
+                                        <td class="text-center">••••••••</td>
                                         <td class="text-center">
                                             <div class="d-flex justify-content-center gap-2">
-                                                <a asp-action="Edit" asp-route-id="@item.StaffId" class="btn btn-sm btn-outline-primary rounded-circle" title="Edit">
+                                                <a asp-action="Edit" asp-route-id="@item.StaffId"
+                                                   class="btn btn-sm btn-outline-primary rounded-circle"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Staff">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
-                                                <a asp-action="Details" asp-route-id="@item.StaffId" class="btn btn-sm btn-outline-success rounded-circle" title="Details">
+                                                <a asp-action="Details" asp-route-id="@item.StaffId"
+                                                   class="btn btn-sm btn-outline-success rounded-circle"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top" title="View Details">
                                                     <i class="bi bi-info-circle"></i>
                                                 </a>
-                                                <a asp-action="Delete" asp-route-id="@item.StaffId" class="btn btn-sm btn-outline-danger rounded-circle" title="Delete">
+                                                <a asp-action="Delete" asp-route-id="@item.StaffId"
+                                                   class="btn btn-sm btn-outline-danger rounded-circle"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Staff">
                                                     <i class="bi bi-trash"></i>
                                                 </a>
                                             </div>
@@ -101,3 +111,10 @@
         </div>
     </div>
 </section>
+
+<script>
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+</script>

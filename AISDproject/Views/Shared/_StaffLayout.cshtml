@@ -36,7 +36,7 @@
                             <a class="nav-link" asp-controller="Orders" asp-action="Index">Orders</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="MenuItems" asp-action="Index">Menu</a>
+                            <a class="nav-link" asp-controller="Reservations" asp-action="Index">Reservations</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Tables" asp-action="Index">Tables</a>
@@ -44,7 +44,11 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Categories" asp-action="Index">Categories</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="TimeSlots" asp-action="Index">Time Slots</a>
+                        </li>
                     }
+
 
                     @if (role == "Admin")
                     {
@@ -58,6 +62,11 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Orders" asp-action="Index">Orders</a>
                         </li>
+                    }
+                    {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="OrderItems" asp-action="Index">Order Items</a>
+                    </li>
                     }
 
                     @if (role == "Cashier")

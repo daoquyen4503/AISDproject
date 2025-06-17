@@ -71,7 +71,7 @@
 
 <section class="create-bg">
     <div class="container">
-        <h2 class="section-title">Add a New Table</h2>
+        <h2 class="section-title">Create New Table</h2>
 
         <div class="card-create mt-3">
             <form asp-action="Create" method="post" novalidate>
@@ -94,10 +94,8 @@
                 <!-- Status -->
                 <div class="form-group mb-4">
                     <label asp-for="Status" class="form-label">Status</label>
-                    <select asp-for="Status"
-                            asp-items="Html.GetEnumSelectList<Table.TableStatus>()"
-                            class="form-select">
-                        <option value="">-- Select status --</option>
+                    <select asp-for="Status" asp-items="Html.GetEnumSelectList<Table.TableStatus>()" class="form-select">
+                        <option value="">-- Select Status --</option>
                     </select>
                     <span asp-validation-for="Status" class="text-danger small"></span>
                 </div>
@@ -105,10 +103,10 @@
                 <!-- Buttons -->
                 <div class="d-flex justify-content-between align-items-center">
                     <a asp-action="Index" class="btn btn-outline-secondary-custom rounded-pill">
-                        ← Back
+                        Back
                     </a>
                     <button type="submit" class="btn btn-primary-custom rounded-pill">
-                        <i class="bi bi-plus-circle me-1"></i> Create
+                        Create
                     </button>
                 </div>
             </form>

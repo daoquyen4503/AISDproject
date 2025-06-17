@@ -4,19 +4,50 @@
         Model.MenuItems.ToDictionary(m => m.MenuItemId, m => m.Price)
     );
     ViewData["Title"] = "Edit Order";
-    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<style>
+    .section-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1d3557;
+    }
+
+    .table th, .table td {
+        vertical-align: middle !important;
+        text-align: center;
+    }
+
+    .btn {
+        border-radius: 20px;
+    }
+
+    .table thead {
+        background-color: #1d3557;
+        color: #fff;
+    }
+
+    .total-row {
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: #1d3557;
+    }
+</style>
 
 <section class="section-bg py-5">
     <div class="container" data-aos="fade-up">
+
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold text-danger mb-0">✏️ Edit Order #@Model.OrderId</h2>
-            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">← Back</a>
+            <h2 class="section-title mb-0">Edit Order #@Model.OrderId</h2>
+            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                Back
+            </a>
         </div>
 
         <form asp-action="Edit" method="post" class="card shadow p-4 rounded-4 border-0">
             <input type="hidden" asp-for="OrderId" />
-            <input type="hidden" asp-for="TotalAmount" /> <!-- ✅ Thêm dòng này -->
+            <input type="hidden" asp-for="TotalAmount" />
 
             <div class="mb-3">
                 <label asp-for="TableId" class="form-label fw-semibold">Table</label>
@@ -38,11 +69,11 @@
                 </select>
             </div>
 
-            <h5 class="mt-4">🧾 Items</h5>
+            <h5 class="fw-bold text-primary mt-4 mb-3">Order Items</h5>
             <div class="table-responsive">
-                <table class="table table-hover table-bordered align-middle">
-                    <thead class="table-light">
-                        <tr class="text-center">
+                <table class="table table-bordered align-middle">
+                    <thead>
+                        <tr>
                             <th>Dish</th>
                             <th>Price</th>
                             <th>Qty</th>
@@ -52,28 +83,27 @@
                     <tbody>
                         @for (int i = 0; i < Model.Items.Count; i++)
                         {
-                            var price = Model.MenuItems.FirstOrDefault(m => m.MenuItemId == Model.Items[i].MenuItemId)?.Price ?? 0;
-                            <tr class="text-center">
+                            <tr>
                                 <td>
-                                    <select asp-for="Items[@i].MenuItemId" class="form-control" asp-items="Model.MenuItemList"></select>
+                                    <select asp-for="Items[@i].MenuItemId" class="form-control menu-select" data-index="@i" asp-items="Model.MenuItemList"></select>
                                 </td>
-                                <td>@price.ToString("N0") đ</td>
-                                <td><input asp-for="Items[@i].Quantity" class="form-control text-center" /></td>
-                                <td>@((price * Model.Items[i].Quantity).ToString("N0")) đ</td>
+                                <td><span class="price" data-index="@i">0</span></td>
+                                <td><input asp-for="Items[@i].Quantity" class="form-control quantity-input text-center" data-index="@i" /></td>
+                                <td><span class="line-total" data-index="@i">0</span></td>
                             </tr>
                         }
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="3" class="text-end"><strong>Total:</strong></td>
-                            <td><strong id="total-display">@Model.TotalAmount.ToString("N0") đ</strong></td>
+                            <td colspan="3" class="text-end total-row">Total:</td>
+                            <td class="total-row"><span id="total-display">0</span> ₫</td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
 
-            <div class="text-end">
-                <button type="submit" class="btn btn-danger rounded-pill px-4">💾 Save</button>
+            <div class="text-end mt-3">
+                <button type="submit" class="btn btn-success rounded-pill px-4">Save</button>
             </div>
         </form>
 
@@ -85,34 +115,27 @@
                 const rows = document.querySelectorAll("tbody tr");
 
                 rows.forEach((row, index) => {
-                    const select = row.querySelector(`select[name="Items[${index}].MenuItemId"]`);
-                    const qtyInput = row.querySelector(`input[name="Items[${index}].Quantity"]`);
-                    const priceCell = row.children[1];
-                    const subtotalCell = row.children[3];
+                    const menuId = row.querySelector(`select[data-index="${index}"]`).value;
+                    const qty = parseInt(row.querySelector(`input[data-index="${index}"]`).value) || 0;
+                    const price = menuPrices[menuId] || 0;
+                    const subtotal = price * qty;
 
-                    const menuItemId = select.value;
-                    const quantity = parseInt(qtyInput.value) || 0;
-                    const price = menuPrices[menuItemId] || 0;
-                    const subtotal = price * quantity;
-
-                    priceCell.textContent = price.toLocaleString() + " đ";
-                    subtotalCell.textContent = subtotal.toLocaleString() + " đ";
+                    row.querySelector(`.price[data-index="${index}"]`).textContent = price.toLocaleString();
+                    row.querySelector(`.line-total[data-index="${index}"]`).textContent = subtotal.toLocaleString();
 
                     total += subtotal;
                 });
 
-                document.getElementById("total-display").textContent = total.toLocaleString() + " đ";
+                document.getElementById("total-display").textContent = total.toLocaleString();
                 document.querySelector("input[name='TotalAmount']").value = total;
             }
 
             window.addEventListener('DOMContentLoaded', function () {
                 updateTotals();
-
                 document.querySelectorAll("select, input[type='number'], input[type='text']").forEach(input => {
                     input.addEventListener("change", updateTotals);
                 });
             });
         </script>
-
     </div>
 </section>

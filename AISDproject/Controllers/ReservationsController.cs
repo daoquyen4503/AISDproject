@@ -24,6 +24,7 @@ namespace AISDproject.Controllers
             _timeSlotService = timeSlotService;
         }
 
+        // Show all reservations - only Admin or Manager
         [AuthorizeRole("Admin", "Manager")]
         public async Task<IActionResult> Index()
         {
@@ -31,14 +32,18 @@ namespace AISDproject.Controllers
             return View(reservations);
         }
 
+        // View reservation detail - only Admin or Manager
         [AuthorizeRole("Admin", "Manager")]
         public async Task<IActionResult> Details(int id)
         {
             var reservation = await _reservationService.GetReservationByIdAsync(id);
-            if (reservation == null) return NotFound();
+            if (reservation == null)
+                return NotFound();
+
             return View(reservation);
         }
 
+        // Show form to create reservation (public access)
         [AllowAnonymous]
         public async Task<IActionResult> Create()
         {
@@ -46,6 +51,7 @@ namespace AISDproject.Controllers
             return View();
         }
 
+        // Handle reservation form submit
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
@@ -54,6 +60,9 @@ namespace AISDproject.Controllers
             if (ModelState.IsValid)
             {
                 await _reservationService.CreateReservationAsync(reservation);
+
+                // Success notification for UI
+                TempData["SuccessMessage"] = "Reservation created successfully!";
                 return RedirectToAction(nameof(Create));
             }
 
@@ -61,22 +70,26 @@ namespace AISDproject.Controllers
             return View(reservation);
         }
 
+        // Show form to edit reservation
         [AuthorizeRole("Admin", "Manager")]
         public async Task<IActionResult> Edit(int id)
         {
             var reservation = await _reservationService.GetReservationByIdAsync(id);
-            if (reservation == null) return NotFound();
+            if (reservation == null)
+                return NotFound();
 
             await PopulateDropdowns();
             return View(reservation);
         }
 
+        // Handle reservation update
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AuthorizeRole("Admin", "Manager")]
         public async Task<IActionResult> Edit(int id, Reservation reservation)
         {
-            if (id != reservation.ReservationId) return BadRequest();
+            if (id != reservation.ReservationId)
+                return BadRequest();
 
             if (ModelState.IsValid)
             {
@@ -88,14 +101,18 @@ namespace AISDproject.Controllers
             return View(reservation);
         }
 
+        // Confirm deletion
         [AuthorizeRole("Admin", "Manager")]
         public async Task<IActionResult> Delete(int id)
         {
             var reservation = await _reservationService.GetReservationByIdAsync(id);
-            if (reservation == null) return NotFound();
+            if (reservation == null)
+                return NotFound();
+
             return View(reservation);
         }
 
+        // Execute deletion
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [AuthorizeRole("Admin", "Manager")]
@@ -105,10 +122,11 @@ namespace AISDproject.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Load dropdown data (tables and time slots)
         private async Task PopulateDropdowns()
         {
             var tables = await _tableService.GetAllTablesAsync();
-            var timeSlots = await _timeSlotService.GetAllTimeSlotsAsync(); // ĐÚNG tên method
+            var timeSlots = await _timeSlotService.GetAllTimeSlotsAsync();
 
             ViewBag.TableList = new SelectList(tables, "TableId", "TableName");
             ViewBag.TimeSlotList = new SelectList(timeSlots, "TimeSlotId", "DisplayTime");

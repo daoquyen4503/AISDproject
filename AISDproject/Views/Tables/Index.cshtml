@@ -6,28 +6,60 @@
     Layout = "~/Views/Shared/_StaffLayout.cshtml";
 }
 
-<section class="section-bg py-5">
-    <div class="container" data-aos="fade-up">
-        <!-- Title + Add Button -->
+<style>
+    .section-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1d3557;
+    }
+
+    .btn-danger-custom {
+        background-color: #c92a2a;
+        border-color: #c92a2a;
+        color: white;
+        font-weight: 500;
+        padding: 8px 24px;
+        font-size: 14px;
+    }
+
+        .btn-danger-custom:hover {
+            background-color: #a61e1e;
+            border-color: #a61e1e;
+        }
+
+    .action-btns .btn {
+        padding: 4px 10px;
+        font-size: 13px;
+    }
+
+    .badge-status {
+        font-size: 13px;
+        padding: 6px 14px;
+    }
+</style>
+
+<section class="py-4">
+    <div class="container">
+
+        <!-- Title and Add -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold text-danger mb-0">Manage Restaurant Tables</h2>
-            <a asp-action="Create" class="btn btn-danger rounded-pill shadow px-4 py-2">
-                <i class="bi bi-plus-circle me-1"></i> Add New Table
+            <h2 class="section-title mb-0">Manage Restaurant Tables</h2>
+            <a asp-action="Create" class="btn btn-danger-custom rounded-pill shadow">
+                Add New Table
             </a>
         </div>
 
-
-        <!-- Table -->
-        <div class="card border-0 shadow-lg rounded-4">
+        <!-- Table listing -->
+        <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body p-4">
                 <div class="table-responsive">
                     <table class="table table-hover table-bordered align-middle mb-0">
-                        <thead class="text-center bg-light">
+                        <thead class="text-center table-light">
                             <tr>
                                 <th>Table Name</th>
                                 <th>Capacity</th>
                                 <th>Status</th>
-                                <th style="width: 100px;">Actions</th>
+                                <th style="width: 160px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -35,7 +67,7 @@
                             {
                                 <tr>
                                     <td colspan="4" class="text-center text-muted py-4">
-                                        <i class="bi bi-exclamation-circle-fill me-2"></i> No tables available.
+                                        No tables found.
                                     </td>
                                 </tr>
                             }
@@ -43,39 +75,32 @@
                             {
                                 foreach (var item in Model)
                                 {
-                                    <tr>
+                                    <tr class="text-center">
                                         <td class="fw-semibold">@item.TableName</td>
-                                        <td class="text-center">@item.Capacity</td>
-                                        <td class="text-center">
+                                        <td>@item.Capacity</td>
+                                        <td>
                                             @if (item.Status == Table.TableStatus.Available)
                                             {
-                                                <span class="badge bg-success px-3 py-2">Available</span>
+                                                <span class="badge bg-success badge-status">Available</span>
                                             }
                                             else
                                             {
-                                                <span class="badge bg-secondary px-3 py-2">Unavailable</span>
+                                                <span class="badge bg-secondary badge-status">Unavailable</span>
                                             }
                                         </td>
-                                        <td class="text-center">
+                                        <td class="action-btns">
                                             <div class="d-flex justify-content-center gap-2">
-                                                <a asp-action="Edit" asp-route-id="@item.TableId"
-                                                   class="btn btn-sm btn-outline-primary rounded-circle"
-                                                   title="Edit">
-                                                    <i class="bi bi-pencil-square"></i>
+                                                <a asp-action="Edit" asp-route-id="@item.TableId" class="btn btn-sm btn-outline-primary rounded-pill">
+                                                    Edit
                                                 </a>
-                                                <a asp-action="Details" asp-route-id="@item.TableId"
-                                                   class="btn btn-sm btn-outline-success rounded-circle"
-                                                   title="Details">
-                                                    <i class="bi bi-info-circle"></i>
+                                                <a asp-action="Details" asp-route-id="@item.TableId" class="btn btn-sm btn-outline-secondary rounded-pill">
+                                                    Details
                                                 </a>
-                                                <a asp-action="Delete" asp-route-id="@item.TableId"
-                                                   class="btn btn-sm btn-outline-danger rounded-circle"
-                                                   title="Delete">
-                                                    <i class="bi bi-trash"></i>
+                                                <a asp-action="Delete" asp-route-id="@item.TableId" class="btn btn-sm btn-outline-danger rounded-pill">
+                                                    Delete
                                                 </a>
                                             </div>
                                         </td>
-
                                     </tr>
                                 }
                             }
@@ -84,5 +109,6 @@
                 </div>
             </div>
         </div>
+
     </div>
 </section>

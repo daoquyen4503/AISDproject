@@ -3,7 +3,32 @@
 @{
     ViewData["Title"] = "Create Order Item";
     Layout = "~/Views/Shared/_StaffLayout.cshtml";
+    var menuItems = (IEnumerable<AISDproject.Models.MenuItem>)ViewBag.MenuItems;
 }
+
+<style>
+    .fade-in {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+        opacity: 0.2;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+    }
+
+    .dish-image-preview {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        display: none;
+        margin-top: 10px;
+    }
+</style>
 
 <section class="section-bg py-5">
     <div class="container" data-aos="fade-up">
@@ -26,8 +51,20 @@
                     <!-- MenuItem -->
                     <div class="form-group mb-3">
                         <label asp-for="MenuItemId" class="form-label fw-semibold">Menu Item</label>
-                        <select asp-for="MenuItemId" class="form-control" asp-items="ViewBag.MenuItemId" id="menuItemSelect"></select>
+                        <select asp-for="MenuItemId" class="form-control" id="menuItemSelect">
+                            <option value="">-- Select Dish --</option>
+                            @foreach (var item in menuItems)
+                            {
+                                <option value="@item.MenuItemId"
+                                        data-price="@item.Price"
+                                        data-img="@item.ImageUrl">
+                                    🍽️ @item.Name
+                                </option>
+                            }
+                        </select>
                         <span asp-validation-for="MenuItemId" class="text-danger small"></span>
+
+                        <img id="dishImagePreview" class="dish-image-preview" src="#" alt="Dish Preview" />
                     </div>
 
                     <!-- Quantity -->
@@ -40,7 +77,7 @@
                     <!-- Subtotal -->
                     <div class="form-group mb-4">
                         <label class="form-label fw-semibold">Subtotal</label>
-                        <input type="text" class="form-control bg-light" id="subtotalDisplay" readonly />
+                        <input type="text" class="form-control bg-light text-end rounded-pill" id="subtotalDisplay" readonly />
                     </div>
 
                     <!-- Buttons -->
@@ -62,22 +99,47 @@
     @await Html.PartialAsync("_ValidationScriptsPartial")
 
     <script>
-        const menuPrices = {
-        @foreach (var item in (IEnumerable<AISDproject.Models.MenuItem>)ViewBag.MenuItems)
-        {
-            @:$"{item.MenuItemId}: {item.Price},"
-        }
-        };
+        const select = document.getElementById('menuItemSelect');
+        const qtyInput = document.getElementById('quantityInput');
+        const subtotalDisplay = document.getElementById('subtotalDisplay');
+        const imagePreview = document.getElementById('dishImagePreview');
 
         function calculateSubtotal() {
-            const menuItemId = parseInt(document.getElementById('menuItemSelect').value);
-            const quantity = parseInt(document.getElementById('quantityInput').value) || 0;
-            const price = menuPrices[menuItemId] || 0;
-            document.getElementById('subtotalDisplay').value = (price * quantity).toFixed(2);
+            const selected = select.options[select.selectedIndex];
+            const price = parseFloat(selected.dataset.price || 0);
+            const quantity = parseInt(qtyInput.value) || 0;
+            const subtotal = price * quantity;
+
+            subtotalDisplay.classList.add("fade-in");
+            subtotalDisplay.value = subtotal.toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            });
+
+            setTimeout(() => subtotalDisplay.classList.remove("fade-in"), 300);
         }
 
-        document.getElementById('menuItemSelect').addEventListener('change', calculateSubtotal);
-        document.getElementById('quantityInput').addEventListener('input', calculateSubtotal);
-        calculateSubtotal();
+        function updateDishImage() {
+            const selected = select.options[select.selectedIndex];
+            const imgSrc = selected.dataset.img;
+
+            if (imgSrc) {
+                imagePreview.src = imgSrc;
+                imagePreview.style.display = 'block';
+                imagePreview.classList.add('fade-in');
+            } else {
+                imagePreview.style.display = 'none';
+            }
+        }
+
+        select.addEventListener('change', () => {
+            calculateSubtotal();
+            updateDishImage();
+        });
+        qtyInput.addEventListener('input', calculateSubtotal);
+        window.addEventListener('DOMContentLoaded', () => {
+            calculateSubtotal();
+            updateDishImage();
+        });
     </script>
 }
