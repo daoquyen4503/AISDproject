@@ -11,7 +11,7 @@ namespace AISDproject.Models
         public string FullName { get; set; }
 
         [Required]
-        public string Role { get; set; }
+        public string Role { get; set; } // Waiter, Chef, Cashier, Admin...
 
         [Required]
         public string Username { get; set; }

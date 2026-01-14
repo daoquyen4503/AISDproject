@@ -4,46 +4,75 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - AISDproject</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/AISDproject.styles.css" asp-append-version="true" />
-</head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">AISDproject</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - AISDproject - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="~/assets/vendor/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/assets/vendor/bootstrap-icons/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/assets/vendor/boxicons/css/boxicons.min.css" />
+    <link rel="stylesheet" href="~/assets/vendor/glightbox/css/glightbox.min.css" />
+    <link rel="stylesheet" href="~/assets/vendor/swiper/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="~/assets/css/style.css" />
+    @* <link href="~/assets/vendor/aos/aos.css" rel="stylesheet" /> *@
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+</head>
+
+<body>
+
+    <!-- ======= Header/Navbar ======= -->
+    <header id="header" class="header fixed-top d-flex align-items-center">
+        <div class="container-fluid d-flex align-items-center justify-content-between">
+
+            <!-- Logo -->
+            <a asp-controller="Home" asp-action="Index" class="logo d-flex align-items-center me-auto me-lg-0">
+                <h1>Yummy<span>.</span></h1>
+            </a>
+
+            <!-- Navbar -->
+            <nav id="navbar" class="navbar navmenu">
+                <ul>
+                    <li><a class="nav-link scrollto active" asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a class="nav-link scrollto" href="#about">About</a></li>
+                    @* <li><a class="nav-link scrollto" href="#events">Events</a></li> *@
+                    <li><a class="nav-link scrollto" href="#chefs">Chefs</a></li>
+                    @* <li><a class="nav-link scrollto" href="#gallery">Gallery</a></li> *@
+                    <li><a class="nav-link scrollto" asp-controller="MenuItems" asp-action="Index">Menu</a></li>
+                    <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
+                </ul>
+                <i class="bi bi-list mobile-nav-toggle"></i>
+            </nav>
+
+            <div class="d-flex align-items-center">
+                <a asp-controller="Reservations" asp-action="Create" class="btn-book-a-table d-none d-lg-flex me-2">Book a Table</a>
+                <a asp-controller="Login" asp-action="Index" class="btn-book-a-table d-none d-lg-flex">Log in</a>
+            </div>
+
+        </div>
+    </header>
+
+    <main id="main" style="margin-top: 100px;">
+        @RenderBody()
+    </main>
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer" class="footer mt-auto bg-dark text-white-50">
+        <div class="container py-3 text-center">
+            <div class="copyright">
+                &copy; 2025 <strong><span>AISDproject</span></strong>. All Rights Reserved
+            </div>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+
+    <!-- ======= Scripts ======= -->
+    <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="~/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="~/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    @* <script src="~/assets/vendor/php-email-form/validate.js"></script> *@
+    <script src="~/assets/js/main.js"></script>
+    @* <script src="~/assets/vendor/aos/aos.js"></script> *@
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

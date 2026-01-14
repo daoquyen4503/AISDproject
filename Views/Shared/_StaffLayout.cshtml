@@ -1,0 +1,50 @@
+﻿@*@{
+    Layout = "_StaffLayout";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Staff Portal</title>
+
+    <link rel="stylesheet" href="~/assets/vendor/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/assets/vendor/bootstrap-icons/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/assets/css/style.css" />
+</head>
+<body>
+     ======= Header ======= 
+    <header id="header" class="header fixed-top d-flex align-items-center bg-dark">
+        <div class="container d-flex align-items-center justify-content-between">
+            <h1 class="logo me-auto">
+                <a asp-controller="Home" asp-action="Index" class="text-white">Staff<span class="text-danger">Portal</span></a>
+            </h1>
+
+            <nav id="navbar" class="navbar">
+                <ul>
+                    <li><a class="nav-link text-white" asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
+                    <li><a class="nav-link text-white" asp-controller="Orders" asp-action="Index">Orders</a></li>
+                    <li><a class="nav-link text-white" asp-controller="MenuItems" asp-action="Index">Menu</a></li>
+                    <li><a class="nav-link text-white" asp-controller="Account" asp-action="Profile">Profile</a></li>
+                    <li><a class="nav-link text-white" asp-controller="Account" asp-action="Logout">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main" style="margin-top: 90px;">
+        <div class="container">
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">© 2025 Staff Portal. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>*@

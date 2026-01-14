@@ -1,46 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AISDproject.Models;
+using AISDproject.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using AISDproject.Data;
-using AISDproject.Models;
+using System.IO;
+using System.Threading.Tasks;
+using AISDproject.Filters; // Thêm namespace cho filter
 
 namespace AISDproject.Controllers
 {
+    //[AuthorizeRole("Admin", "Manager")]
     public class MenuItemsController : Controller
     {
-        private readonly RestaurantContext _context;
+        private readonly IMenuItemService _service;
 
-        public MenuItemsController(RestaurantContext context)
+        public MenuItemsController(IMenuItemService service)
         {
-            _context = context;
+            _service = service;
         }
 
         // GET: MenuItems
         public async Task<IActionResult> Index()
         {
-            return View(await _context.MenuItems.ToListAsync());
-        }
-
-        // GET: MenuItems/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var menuItem = await _context.MenuItems
-                .FirstOrDefaultAsync(m => m.MenuItemId == id);
-            if (menuItem == null)
-            {
-                return NotFound();
-            }
-
-            return View(menuItem);
+            var items = await _service.GetAllAsync();
+            return View(items);
         }
 
         // GET: MenuItems/Create
@@ -50,101 +31,89 @@ namespace AISDproject.Controllers
         }
 
         // POST: MenuItems/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MenuItemId,Name,Description,Price,ImageUrl")] MenuItem menuItem)
+        public async Task<IActionResult> Create(MenuItem item)
         {
             if (!ModelState.IsValid)
-            {
-                var errors = ModelState.Values.SelectMany(v => v.Errors)
-                                              .Select(e => e.ErrorMessage)
-                                              .ToList();
+                return View(item);
 
-                foreach (var error in errors)
+            if (item.ImageFile != null && item.ImageFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "menu");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var uniqueFileName = Guid.NewGuid() + Path.GetExtension(item.ImageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    Console.WriteLine("Validation error: " + error); // hoặc log
+                    await item.ImageFile.CopyToAsync(stream);
                 }
 
-                return View(menuItem);
+                item.ImageUrl = "/images/menu/" + uniqueFileName;
             }
 
-            // ✅ Đoạn này đang thiếu
-            _context.Add(menuItem);
-            await _context.SaveChangesAsync();
-
+            await _service.AddAsync(item);
             return RedirectToAction(nameof(Index));
         }
 
-
         // GET: MenuItems/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
+            var item = await _service.GetByIdAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            var menuItem = await _context.MenuItems.FindAsync(id);
-            if (menuItem == null)
-            {
-                return NotFound();
-            }
-            return View(menuItem);
+            return View(item);
         }
 
         // POST: MenuItems/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("MenuItemId,Name,Description,Price,ImageUrl")] MenuItem menuItem)
+        public async Task<IActionResult> Edit(MenuItem item)
         {
-            if (id != menuItem.MenuItemId)
+            if (!ModelState.IsValid)
+                return View(item);
+
+            if (item.ImageFile != null && item.ImageFile.Length > 0)
             {
-                return NotFound();
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "menu");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var uniqueFileName = Guid.NewGuid() + Path.GetExtension(item.ImageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await item.ImageFile.CopyToAsync(stream);
+                }
+
+                item.ImageUrl = "/images/menu/" + uniqueFileName;
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(menuItem);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MenuItemExists(menuItem.MenuItemId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(menuItem);
+            await _service.UpdateAsync(item);
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: MenuItems/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            var item = await _service.GetByIdAsync(id);
+            if (item == null)
+                return NotFound();
+
+            return View(item);
         }
 
         // GET: MenuItems/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
+            var item = await _service.GetByIdAsync(id);
+            if (item == null)
                 return NotFound();
-            }
 
-            var menuItem = await _context.MenuItems
-                .FirstOrDefaultAsync(m => m.MenuItemId == id);
-            if (menuItem == null)
-            {
-                return NotFound();
-            }
-
-            return View(menuItem);
+            return View(item);
         }
 
         // POST: MenuItems/Delete/5
@@ -152,19 +121,8 @@ namespace AISDproject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var menuItem = await _context.MenuItems.FindAsync(id);
-            if (menuItem != null)
-            {
-                _context.MenuItems.Remove(menuItem);
-            }
-
-            await _context.SaveChangesAsync();
+            await _service.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool MenuItemExists(int id)
-        {
-            return _context.MenuItems.Any(e => e.MenuItemId == id);
         }
     }
 }

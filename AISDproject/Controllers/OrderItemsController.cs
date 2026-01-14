@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AISDproject.Data;
 using AISDproject.Models;
+using AISDproject.Filters; // ✅ Bổ sung
 
 namespace AISDproject.Controllers
 {
+    [AuthorizeRole("Waiter", "Cashier")] // ✅ Chỉ waiter có toàn quyền
+    [Route("OrderItems")]
     public class OrderItemsController : Controller
     {
         private readonly RestaurantContext _context;
@@ -19,144 +20,145 @@ namespace AISDproject.Controllers
             _context = context;
         }
 
-        // GET: OrderItems
-        public async Task<IActionResult> Index()
+        // GET: /OrderItems
+        [HttpGet("")]
+        public IActionResult RedirectToIndex()
         {
-            var restaurantContext = _context.OrderItems.Include(o => o.MenuItem).Include(o => o.Order);
-            return View(await restaurantContext.ToListAsync());
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: OrderItems/Details/5
+        // GET: /OrderItems/Index
+        [HttpGet("Index")]
+        public async Task<IActionResult> Index()
+        {
+            var data = _context.OrderItems
+                .Include(o => o.MenuItem)
+                .Include(o => o.Order);
+            return View(await data.ToListAsync());
+        }
+
+        [HttpGet("Details/{id}")]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var orderItem = await _context.OrderItems
                 .Include(o => o.MenuItem)
                 .Include(o => o.Order)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (orderItem == null)
-            {
-                return NotFound();
-            }
 
+            if (orderItem == null) return NotFound();
             return View(orderItem);
         }
 
-        // GET: OrderItems/Create
+        [HttpGet("Create")]
         public IActionResult Create()
         {
-            ViewData["MenuItemId"] = new SelectList(_context.MenuItems, "MenuItemId", "Name");
-            ViewData["OrderId"] = new SelectList(_context.Orders, "OrderId", "OrderId");
+            var menuItems = _context.MenuItems.ToList();
+            var orders = _context.Orders.ToList();
+
+            ViewData["MenuItemId"] = new SelectList(menuItems, "MenuItemId", "Name");
+            ViewData["OrderId"] = new SelectList(orders, "OrderId", "OrderId");
+
+            ViewBag.MenuItems = menuItems;
+
             return View();
         }
 
-        // POST: OrderItems/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,OrderId,MenuItemId,Quantity,Subtotal")] OrderItem orderItem)
+        public async Task<IActionResult> Create([Bind("Id,OrderId,MenuItemId,Quantity")] OrderItem orderItem)
         {
             if (ModelState.IsValid)
             {
+                var menuItem = await _context.MenuItems.FindAsync(orderItem.MenuItemId);
+                if (menuItem != null)
+                {
+                
+                 orderItem.MenuItem = menuItem; // 🔧 Bổ sung gán
+                    
+
+                }
+
                 _context.Add(orderItem);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["MenuItemId"] = new SelectList(_context.MenuItems, "MenuItemId", "Name", orderItem.MenuItemId);
             ViewData["OrderId"] = new SelectList(_context.Orders, "OrderId", "OrderId", orderItem.OrderId);
+            ViewBag.MenuItems = _context.MenuItems.ToList();
             return View(orderItem);
         }
 
-        // GET: OrderItems/Edit/5
+
+        [HttpGet("Edit/{id}")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var orderItem = await _context.OrderItems.FindAsync(id);
-            if (orderItem == null)
-            {
-                return NotFound();
-            }
+            if (orderItem == null) return NotFound();
+
             ViewData["MenuItemId"] = new SelectList(_context.MenuItems, "MenuItemId", "Name", orderItem.MenuItemId);
             ViewData["OrderId"] = new SelectList(_context.Orders, "OrderId", "OrderId", orderItem.OrderId);
             return View(orderItem);
         }
 
-        // POST: OrderItems/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost("Edit/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,OrderId,MenuItemId,Quantity,Subtotal")] OrderItem orderItem)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,OrderId,MenuItemId,Quantity")] OrderItem orderItem)
         {
-            if (id != orderItem.Id)
-            {
-                return NotFound();
-            }
+            if (id != orderItem.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    var menuItem = await _context.MenuItems.FindAsync(orderItem.MenuItemId);
+                    if (menuItem != null)
+                    {
+                        orderItem.MenuItem = menuItem;
+
+                    }
+
                     _context.Update(orderItem);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!OrderItemExists(orderItem.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!OrderItemExists(orderItem.Id)) return NotFound();
+                    else throw;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["MenuItemId"] = new SelectList(_context.MenuItems, "MenuItemId", "Name", orderItem.MenuItemId);
             ViewData["OrderId"] = new SelectList(_context.Orders, "OrderId", "OrderId", orderItem.OrderId);
             return View(orderItem);
         }
 
-        // GET: OrderItems/Delete/5
+        [HttpGet("Delete/{id}")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var orderItem = await _context.OrderItems
                 .Include(o => o.MenuItem)
                 .Include(o => o.Order)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (orderItem == null)
-            {
-                return NotFound();
-            }
 
+            if (orderItem == null) return NotFound();
             return View(orderItem);
         }
 
-        // POST: OrderItems/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost("Delete/{id}"), ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var orderItem = await _context.OrderItems.FindAsync(id);
-            if (orderItem != null)
-            {
-                _context.OrderItems.Remove(orderItem);
-            }
+            if (orderItem != null) _context.OrderItems.Remove(orderItem);
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

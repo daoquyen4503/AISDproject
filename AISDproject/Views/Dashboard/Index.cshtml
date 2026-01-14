@@ -1,0 +1,36 @@
+﻿@model AISDproject.ViewModels.DashboardViewModel
+
+<section class="container py-4">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-danger">Admin Dashboard</h2>
+        <p class="text-muted">Overview of today’s performance</p>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-receipt-cutoff me-1"></i> Total Orders Today</h6>
+                    <p class="card-text display-6 fw-bold">@Model.TotalOrdersToday</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-currency-dollar me-1"></i> Revenue Today</h6>
+                    <p class="card-text display-6 fw-bold">$@Model.RevenueToday.ToString("N0")</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-warning shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-calendar-check me-1"></i> Active Reservations</h6>
+                    <p class="card-text display-6 fw-bold">@Model.ActiveReservations</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

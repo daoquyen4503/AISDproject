@@ -1,0 +1,101 @@
+﻿@model IEnumerable<AISDproject.Models.Staff>
+
+@{
+    ViewData["Title"] = "Manage Staff";
+}
+
+<style>
+    .index-bg {
+        background: #f8f9fa;
+        padding: 20px 0 40px;
+    }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1d3557;
+        margin-bottom: 20px;
+    }
+
+    .btn-danger-custom {
+        background-color: #c92a2a;
+        border-color: #c92a2a;
+        color: white;
+        padding: 8px 24px;
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+        .btn-danger-custom:hover {
+            background-color: #a61e1e;
+            border-color: #a61e1e;
+        }
+
+    .table th, .table td {
+        vertical-align: middle !important;
+    }
+</style>
+
+<section class="index-bg">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title">Manage Staff</h2>
+            <a asp-action="Create" class="btn btn-danger-custom rounded-pill shadow">
+                <i class="bi bi-plus-circle me-1"></i> Add New Staff
+            </a>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle mb-0">
+                        <thead class="text-center text-white" style="background-color: #dc3545;">
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Role</th>
+                                <th>Username</th>
+                                <th>Password</th>
+                                <th style="width: 150px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        <i class="bi bi-exclamation-circle-fill me-2"></i> No staff records available.
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td class="text-center">@item.FullName</td>
+                                        <td class="text-center">@item.Role</td>
+                                        <td class="text-center">@item.Username</td>
+                                        <td class="text-center">@item.PasswordHash</td>
+                                        <td class="text-center">
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <a asp-action="Edit" asp-route-id="@item.StaffId" class="btn btn-sm btn-outline-primary rounded-circle" title="Edit">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                                <a asp-action="Details" asp-route-id="@item.StaffId" class="btn btn-sm btn-outline-success rounded-circle" title="Details">
+                                                    <i class="bi bi-info-circle"></i>
+                                                </a>
+                                                <a asp-action="Delete" asp-route-id="@item.StaffId" class="btn btn-sm btn-outline-danger rounded-circle" title="Delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

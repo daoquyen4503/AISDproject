@@ -1,41 +1,76 @@
-﻿@model AISDproject.Models.Order
-
+﻿@model AISDproject.ViewModels.OrderEditViewModel
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Edit</h1>
+<section class="section-bg py-5">
+    <div class="container" data-aos="fade-up">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-danger mb-0">✏️ Edit Order #@Model.OrderId</h2>
+            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">← Back</a>
+        </div>
 
-<h4>Order</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form asp-action="Edit" method="post" class="card shadow p-4 rounded-4 border-0">
             <input type="hidden" asp-for="OrderId" />
-            <div class="form-group">
-                <label asp-for="OrderTime" class="control-label"></label>
-                <input asp-for="OrderTime" class="form-control" />
-                <span asp-validation-for="OrderTime" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="TableId" class="form-label fw-semibold">Table</label>
+                <select asp-for="TableId" class="form-control rounded-pill" asp-items="Model.TableList"></select>
             </div>
-            <div class="form-group">
-                <label asp-for="TableId" class="control-label"></label>
-                <select asp-for="TableId" class="form-control" asp-items="ViewBag.TableId"></select>
-                <span asp-validation-for="TableId" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="StaffId" class="form-label fw-semibold">Staff</label>
+                <select asp-for="StaffId" class="form-control rounded-pill" asp-items="Model.StaffList"></select>
             </div>
-            <div class="form-group">
-                <label asp-for="StaffId" class="control-label"></label>
-                <select asp-for="StaffId" class="form-control" asp-items="ViewBag.StaffId"></select>
-                <span asp-validation-for="StaffId" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="Status" class="form-label fw-semibold">Status</label>
+                <select asp-for="Status" class="form-control rounded-pill">
+                    @foreach (var status in Enum.GetValues(typeof(AISDproject.Models.OrderStatus)))
+                    {
+                        <option value="@status" selected="@(Model.Status == (AISDproject.Models.OrderStatus)status)">@status</option>
+                    }
+                </select>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+
+            <h5 class="mt-4">🧾 Items</h5>
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr class="text-center">
+                            <th>Dish</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Items.Count; i++)
+                        {
+                            var price = Model.MenuItems.FirstOrDefault(m => m.MenuItemId == Model.Items[i].MenuItemId)?.Price ?? 0;
+                            <tr class="text-center">
+                                <td>
+                                    <select asp-for="Items[@i].MenuItemId" class="form-control" asp-items="Model.MenuItemList"></select>
+                                </td>
+                                <td>@price.ToString("N0") đ</td>
+                                <td><input asp-for="Items[@i].Quantity" class="form-control text-center" /></td>
+                                <td>@(price * Model.Items[i].Quantity).ToString("N0") đ</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                            <td><strong>@Model.TotalAmount.ToString("N0") đ</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-danger rounded-pill px-4">💾 Save</button>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
+</section>

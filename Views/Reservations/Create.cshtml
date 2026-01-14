@@ -1,0 +1,114 @@
+﻿@model AISDproject.Models.Reservation
+
+@{
+    ViewData["Title"] = "Create Reservation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .reservation-container {
+        background-color: #f8f9fa;
+        border-radius: 20px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        padding: 30px;
+    }
+
+    .form-label {
+        font-weight: 600;
+    }
+
+    .table-map {
+        max-width: 100%;
+        border-radius: 15px;
+        border: 3px solid #dee2e6;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-icon {
+        color: #dc3545;
+        margin-right: 8px;
+    }
+</style>
+
+<section class="py-5">
+    <div class="container" data-aos="fade-up">
+        <div class="section-header text-center mb-3">
+            <h2 class="fw-bold text-danger">📝 Create a Reservation</h2>
+        </div>
+
+        <div class="row g-5">
+            <!-- Form -->
+            <div class="col-lg-6">
+                <div class="reservation-container">
+                    <form asp-controller="Reservations" asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="CustomerName" class="form-label">
+                                <i class="bi bi-person form-icon"></i>Customer Name
+                            </label>
+                            <input asp-for="CustomerName" class="form-control rounded-pill px-3" placeholder="Full Name" />
+                            <span asp-validation-for="CustomerName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="PhoneNumber" class="form-label">
+                                <i class="bi bi-telephone form-icon"></i>Phone Number
+                            </label>
+                            <input asp-for="PhoneNumber" class="form-control rounded-pill px-3" placeholder="e.g. 0123456789" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="ReservationDate" class="form-label">
+                                <i class="bi bi-calendar form-icon"></i>Date
+                            </label>
+                            <input asp-for="ReservationDate" type="date" class="form-control rounded-pill px-3" />
+                            <span asp-validation-for="ReservationDate" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="TimeSlotId" class="form-label">
+                                <i class="bi bi-clock form-icon"></i>Time Slot
+                            </label>
+                            <select asp-for="TimeSlotId" asp-items="ViewBag.TimeSlots" class="form-select rounded-pill px-3">
+                                <option value="">-- Select Time Slot --</option>
+                            </select>
+                            <span asp-validation-for="TimeSlotId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="TableId" class="form-label">
+                                <i class="bi bi-layout-sidebar form-icon"></i>Table
+                            </label>
+                            <select asp-for="TableId" asp-items="ViewBag.Tables" class="form-select rounded-pill px-3">
+                                <option value="">-- Select Table --</option>
+                            </select>
+                            <span asp-validation-for="TableId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-danger rounded-pill px-4 py-2">
+                                <i class="bi bi-check-circle me-1"></i> Confirm Reservation
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="mt-3 text-center">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">← Back to List</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Map -->
+            <div class="col-lg-6 d-flex align-items-center justify-content-center">
+                <img src="~/assets/img/table%20map/table%20map.png" alt="Table Map" class="table-map" asp-append-version="true" />
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

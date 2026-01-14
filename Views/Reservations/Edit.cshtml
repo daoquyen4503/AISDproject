@@ -1,0 +1,109 @@
+﻿@model AISDproject.Models.Reservation
+
+@{
+    ViewData["Title"] = "Edit Reservation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .edit-container {
+        background-color: #f8f9fa;
+        border-radius: 20px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        padding: 30px;
+        max-width: 600px;
+        margin: auto;
+    }
+
+    .form-label {
+        font-weight: 600;
+    }
+
+    .form-icon {
+        color: #dc3545;
+        margin-right: 8px;
+    }
+</style>
+
+<section class="py-5">
+    <div class="container" data-aos="fade-up">
+        <div class="section-header text-center mb-4">
+            <h2 class="fw-bold text-danger">✏️ Edit Reservation</h2>
+        </div>
+
+        <div class="edit-container">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="ReservationId" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="CustomerName" class="form-label">
+                        <i class="bi bi-person form-icon"></i>Customer Name
+                    </label>
+                    <input asp-for="CustomerName" class="form-control rounded-pill px-3" />
+                    <span asp-validation-for="CustomerName" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="PhoneNumber" class="form-label">
+                        <i class="bi bi-telephone form-icon"></i>Phone Number
+                    </label>
+                    <input asp-for="PhoneNumber" class="form-control rounded-pill px-3" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="ReservationDate" class="form-label">
+                        <i class="bi bi-calendar form-icon"></i>Date
+                    </label>
+                    <input asp-for="ReservationDate" type="date" class="form-control rounded-pill px-3" />
+                    <span asp-validation-for="ReservationDate" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="TableId" class="form-label">
+                        <i class="bi bi-layout-sidebar form-icon"></i>Table
+                    </label>
+                    <select asp-for="TableId" asp-items="ViewBag.Tables" class="form-select rounded-pill px-3">
+                        <option value="">-- Select Table --</option>
+                    </select>
+                    <span asp-validation-for="TableId" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="TimeSlotId" class="form-label">
+                        <i class="bi bi-clock form-icon"></i>Time Slot
+                    </label>
+                    <select asp-for="TimeSlotId" asp-items="ViewBag.TimeSlots" class="form-select rounded-pill px-3">
+                        <option value="">-- Select Time Slot --</option>
+                    </select>
+                    <span asp-validation-for="TimeSlotId" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label asp-for="Status" class="form-label">
+                        <i class="bi bi-info-circle form-icon"></i>Status
+                    </label>
+                    <select asp-for="Status" class="form-select rounded-pill px-3" asp-items="Html.GetEnumSelectList<ReservationStatus>()">
+                        <option value="">-- Select Status --</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">
+                        ← Back
+                    </a>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4">
+                        <i class="bi bi-save me-1"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

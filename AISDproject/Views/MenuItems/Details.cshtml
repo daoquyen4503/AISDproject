@@ -1,42 +1,81 @@
 ﻿@model AISDproject.Models.MenuItem
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Menu Item Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Details</h1>
+<style>
+    .details-card {
+        background-color: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+        max-width: 700px;
+        margin: 0 auto;
+    }
 
-<div>
-    <h4>MenuItem</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageUrl)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImageUrl)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.MenuItemId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+    dt {
+        font-weight: 600;
+        color: #343a40;
+    }
+
+    .img-preview {
+        max-height: 200px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .btn-back {
+        font-size: 14px;
+        padding: 8px 20px;
+        margin-right: 10px;
+    }
+</style>
+
+<section class="py-5">
+    <div class="container">
+        <div class="details-card">
+            <h2 class="text-center text-danger fw-bold mb-4">Menu Item Details</h2>
+
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Image</dt>
+                <dd class="col-sm-9">
+                    <img src="@Model.ImageUrl" alt="@Model.Name" class="img-preview" />
+                </dd>
+
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9">@Model.Name</dd>
+
+                <dt class="col-sm-3">Description</dt>
+                <dd class="col-sm-9">@Model.Description</dd>
+
+                <dt class="col-sm-3">Price</dt>
+                <dd class="col-sm-9">@Model.Price.ToString("C")</dd>
+
+                <dt class="col-sm-3">Image Path</dt>
+                <dd class="col-sm-9">@Model.ImageUrl</dd>
+
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Status)
+                    {
+                        <span class="badge bg-success px-3 py-2">Available</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary px-3 py-2">Unavailable</span>
+                    }
+                </dd>
+            </dl>
+
+            <div class="text-end mt-4">
+                <a asp-action="Edit" asp-route-id="@Model.MenuItemId" class="btn btn-danger btn-back">
+                    <i class="bi bi-pencil-square me-1"></i> Edit
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-back">← Back to List</a>
+            </div>
+        </div>
+    </div>
+</section>

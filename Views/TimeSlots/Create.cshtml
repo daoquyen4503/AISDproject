@@ -1,0 +1,101 @@
+﻿@model AISDproject.Models.TimeSlot
+
+@{
+    ViewData["Title"] = "Create Time Slot";
+}
+
+<style>
+    .create-bg {
+        background: #f8f9fa;
+        padding: 20px 0 40px;
+    }
+
+    .card-create {
+        background-color: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 30px 35px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        max-width: 550px;
+        margin: 0 auto;
+    }
+
+    .form-label {
+        font-size: 15px;
+        font-weight: 500;
+        color: #212529;
+    }
+
+    .form-control {
+        height: 42px;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .btn-primary-custom {
+        background-color: #c92a2a;
+        border-color: #c92a2a;
+        color: #fff;
+        font-size: 14px;
+        padding: 8px 24px;
+        font-weight: 500;
+    }
+
+        .btn-primary-custom:hover {
+            background-color: #a61e1e;
+            border-color: #a61e1e;
+        }
+
+    .btn-outline-secondary-custom {
+        font-size: 14px;
+        padding: 8px 20px;
+        color: #6c757d;
+        border: 1px solid #ced4da;
+    }
+
+        .btn-outline-secondary-custom:hover {
+            background-color: #f1f3f5;
+        }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1d3557;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+</style>
+
+
+<section class="create-bg">
+    <div class="container">
+        <h2 class="section-title">Create Time Slot</h2>
+
+        <div class="card-create">
+            <form asp-action="Create" method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="StartTime" class="form-label">Start Time</label>
+                    <input asp-for="StartTime" class="form-control" type="time" />
+                    <span asp-validation-for="StartTime" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label asp-for="EndTime" class="form-label">End Time</label>
+                    <input asp-for="EndTime" class="form-control" type="time" />
+                    <span asp-validation-for="EndTime" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <a asp-action="Index" class="btn btn-outline-secondary-custom rounded-pill">
+                        ← Back
+                    </a>
+                    <button type="submit" class="btn btn-primary-custom rounded-pill">
+                        <i class="bi bi-plus-circle me-1"></i> Create
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
